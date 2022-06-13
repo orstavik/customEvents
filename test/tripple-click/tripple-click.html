@@ -1,0 +1,17 @@
+<h1>hello sunshine</h1>
+
+<script type="module">
+  import {} from "../../src/Event.defaultAction.js";
+  import {} from "../../src/customEvents.js";
+  import {TrippleClick} from "../../src/events/tripple-click.js";
+
+  customEvents.define("tripple-click", TrippleClick);
+  const h1 = document.querySelector("h1");
+  h1.addEventListener("click", e => console.log(e.type));
+  h1.addEventListener("tripple-click", e => console.log(e.type));
+  h1.click();
+  h1.click();
+  h1.click();
+</script>
+
+
