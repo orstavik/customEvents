@@ -7,31 +7,25 @@ customEvents.define = function (str, Class) {
   events[str] = Class;
 };
 
-//str=>obj=>obj => v map
-//todo naive, it doesn't clean itself up perfectly. It can mushroom.
-class StrOOMap {
-  get(Str, o1, o2) {
-    return this[Str]?.get(o1)?.get(o2);
+//obj+obj => obj weakmap
+class OOWeakMap extends WeakMap {
+  get(o1, o2) {
+    return super.get(o1)?.get(o2);
   }
 
-  has(Str, o1, o2) {
-    return !!this.get(Str, o1, o2);
+  set(o1, o2, v) {
+    let one = super.get(o1);
+    one || super.set(o1, one = new WeakMap());
+    one.set(o2, v);
   }
 
-  set(Str, o1, o2, v) {
-    const one = this[Str] || (this[Str] = new WeakMap());
-    let two = one.get(o1);
-    !two && one.set(o1, two = new WeakMap());
-    two.set(o2, v);
-  }
-
-  remove(Str, o1, o2) {
-    return this[Str]?.get(o1)?.remove(o2);
+  remove(o1, o2) {
+    return super.get(o1)?.remove(o2);
   }
 }
 
 //EventType => el => cb => customEvent;
-const customEventInstances = new StrOOMap();
+const customEventInstances = new OOWeakMap();
 //todo ABC. what i need is just the type+el => customEventInstance + [cb1, cb2, cb3]...
 // when there are no more listeners, then call destructor and remove.
 
@@ -39,9 +33,13 @@ function monkeypatchCustomEventsAdd(OG) {
   return function addEventListener_customEvents(type, cb, ...args) {
     const Definition = events[type];
     if (Definition) {
-      if (customEventInstances.has(type, this, cb))
-        throw "what to do when one event is being activated by several cbs on the same element?"; //todo no see ABC
-      customEventInstances.set(type, this, cb, new Definition(this));
+      //only one customEventInstance with the same Definition is added to the same element.
+      let {instance, list} = customEventInstances.get(this, Definition) || {};
+      if (!instance) {
+        instance = new Definition(this), list = [];
+        customEventInstances.set(this, Definition, {instance, list});
+      }
+      list.push({type, cb, args});
     }
     OG.call(this, type, cb, ...args);
   }
@@ -49,15 +47,29 @@ function monkeypatchCustomEventsAdd(OG) {
 
 function monkeypatchCustomEventsRemove(OG) {
   return function removeEventListener_customEvents(type, cb, ...args) {
+    const Definition = events[type];
+    if (Definition) {
+      let {instance, list} = customEventInstances.get(this, Definition); //only one customEventInstance with the same Definition is added to the same element.
+      for (let i = 0; i < list.length; i++) {
+        let {type2, cb2, args} = list[i];
+        if (type2 === type && cb2 === cb) {
+          list.splice(i, 1);
+          break;
+        }
+      }
+      if (list.length === 0) {
+        instance.destructor();
+        customEventInstances.remove(this, Definition);
+      }
+    }
     customEventInstances.remove(type, this, cb)?.destructor();
     OG.call(this, type, cb, ...args);
   }
 }
 
+import {monkeypatchFilteredEvents_add, monkeypatchFilteredEvents_remove} from "./filteredEvents.js";
 //monkeypatch the add/removeEventListener
 (function (EventTargetOG, addEventListenerOG, removeEventListenerOG) {
-  EventTargetOG.prototype.addEventListener =
-    monkeypatchCustomEventsAdd(addEventListenerOG);
-  EventTargetOG.prototype.removeEventListener = 
-    monkeypatchCustomEventsRemove(removeEventListenerOG);
+  EventTargetOG.prototype.addEventListener = monkeypatchFilteredEvents_add(monkeypatchCustomEventsAdd(addEventListenerOG));
+  EventTargetOG.prototype.removeEventListener = monkeypatchFilteredEvents_remove(monkeypatchCustomEventsRemove(removeEventListenerOG));
 })(EventTarget, addEventListener, removeEventListener);

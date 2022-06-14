@@ -1,0 +1,14 @@
+<h1>hello sunshine</h1>
+
+<script type="module">
+  import {} from "../../src/Event.defaultAction.js";
+  import {} from "../../src/customEvents.js";
+  import {TrippleClick} from "../../src/events/tripple-click.js";
+
+  customEvents.define("tripple-click", TrippleClick);
+  const h1 = document.querySelector("h1");
+  h1.addEventListener("click_shift", e => console.log("click_shift"));
+  h1.addEventListener("click", e => console.log("click"));
+  h1.dispatchEvent(new PointerEvent("click"));
+  h1.dispatchEvent(new PointerEvent("click", {shiftKey: true}));
+</script>
