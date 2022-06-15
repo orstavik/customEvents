@@ -24,7 +24,7 @@ const filteredCallbacks = new StrOMap();
 export function monkeypatchFilteredEvents_add(OG) {
   return function addEventListener_filtered(type, cb, ...args) {
     const [name, ...filter] = type.split("_");
-    if (!filter)
+    if (!filter.length)
       return OG.call(this, type, cb, ...args);
     const filterKey = filter.join("_");
     let wrapped = filteredCallbacks.get(filterKey, cb);
