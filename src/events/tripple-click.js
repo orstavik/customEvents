@@ -5,10 +5,17 @@ export class TrippleClick {
     this.listener = this.onClick.bind(this);
     this.reset()
     this.owner.addEventListener("click", this.listener);
+    this.userSelect = this.owner.style.userSelect;
+    this.owner.style.userSelect = "none";
   }
 
   reset() {
     this.clicks = [];
+    this.#updateState();
+  }
+
+  #updateState() {
+    this.owner.setAttribute("_tripple-click", this.clicks.length);
   }
 
   onClick(e) {
@@ -21,15 +28,17 @@ export class TrippleClick {
         trippleClick.one = this.clicks[0];
         trippleClick.two = this.clicks[1];
         trippleClick.three = e;
-        e.defaultAction = _=> this.owner.dispatchEvent(trippleClick);
+        e.defaultAction = _ => this.owner.dispatchEvent(trippleClick);
         return this.reset();
       }
       this.clicks.shift();
     }
     this.clicks.push(e);
+    this.#updateState();
   }
 
   destructor() {
+    this.owner.style.userSelect = this.userSelect;
     this.owner.removeEventListener("click", this.listener);
   }
 }
