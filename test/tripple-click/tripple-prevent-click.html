@@ -1,0 +1,37 @@
+<style>
+  [_tripple-click] {border: 1px solid grey;}
+  [_tripple-click="1"] {border: 3px solid orange;}
+  [_tripple-click="2"] {border: 6px double red;}
+</style>
+
+<main>
+  <div>hello sunshine
+    <h1>prevented</h1>
+    <h2>not prevented</h2>
+  </div>
+</main>
+
+<script type="module">
+  import {} from "../../src/customEvents.js";
+  import {TrippleClick} from "../../src/events/tripple-click.js";
+
+  customEvents.define("tripple-click", TrippleClick);
+  const [main, div, h1, h2] = [...document.querySelectorAll("main, div, h1, h2")];
+
+  main.addEventListener("click", e => console.log(e.currentTarget.tagName));
+  div.addEventListener("click", e => console.log(e.currentTarget.tagName));
+  h1.addEventListener("click", e => console.log(e.currentTarget.tagName));
+  h2.addEventListener("click", e => console.log(e.currentTarget.tagName));
+
+  h1.addEventListener("click", e => e.preventDefault());
+
+  div.addEventListener("tripple-click", e => console.log(e.type));
+
+  h1.click();
+  div.click();
+  h1.click();
+
+  h2.click();
+  div.click();
+  h2.click();
+</script>

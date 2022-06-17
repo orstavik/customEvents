@@ -3,7 +3,7 @@ export class TrippleClick {
   constructor(ownerElement) {
     this.owner = ownerElement;
     this.listener = this.onClick.bind(this);
-    this.reset()
+    this.reset();
     this.owner.addEventListener("click", this.listener);
     this.userSelect = this.owner.style.userSelect;
     this.owner.style.userSelect = "none";
@@ -23,17 +23,17 @@ export class TrippleClick {
       return this.reset();
 
     if (this.clicks.length === 2) {
-      if ((e.timeStamp - this.clicks[0].timeStamp) < 600) {
-        const trippleClick = new e.constructor("tripple-click", e);
-        trippleClick.one = this.clicks[0];
-        trippleClick.two = this.clicks[1];
-        trippleClick.three = e;
-        e.defaultAction = _ => this.owner.dispatchEvent(trippleClick);
-        return this.reset();
-      }
-      this.clicks.shift();
+      const trippleClick = new e.constructor("tripple-click", e);
+      trippleClick.clicks = [...this.clicks, e];
+      e.defaultAction = _ => this.owner.dispatchEvent(trippleClick);
+      return this.reset();
     }
     this.clicks.push(e);
+    setTimeout(_ => {
+      const pos = this.clicks.indexOf(e);
+      pos >= 0 && this.clicks.splice(pos, 1);
+      this.#updateState();
+    }, 600);
     this.#updateState();
   }
 
