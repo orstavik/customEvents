@@ -13,7 +13,7 @@ function rewindPath(event, currentTarget, target, path, composedPath) {
   });
 }
 
-(function monkeyDefaultAction(Event) {
+export function monkeyDefaultAction(Event) {
   const defaultActions = new WeakMap();
   Object.defineProperty(Event.prototype, "defaultAction", {
     get() {
@@ -35,4 +35,4 @@ function rewindPath(event, currentTarget, target, path, composedPath) {
       audio.playbackRate = 2;
     }
   });
-})(Event);
+}
