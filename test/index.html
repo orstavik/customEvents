@@ -1,0 +1,16 @@
+<h1>defaultAction polyfish</h1>
+<div href="defaultAction/"></div>
+<h1>tripple-click</h1>
+<div href="tripple-click/"></div>
+
+<script src="https://cdn.jsdelivr.net/gh/orstavik/TestHTML@v1.0.3/TestHTML.js"></script>
+<script>
+  (async function () {
+    for (let test of document.querySelectorAll("div:not([off])")) {
+      const href = new URL(test.getAttribute('href'), location.href);
+      test.innerHTML = await (await fetch(href)).text();
+      for (let t of test.querySelectorAll("test-html"))
+        t.setAttribute("test", new URL(t.getAttribute("test"), href.href));
+    }
+  })();
+</script>

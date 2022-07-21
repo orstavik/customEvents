@@ -1,0 +1,20 @@
+<test-html test="sync.html">
+  <script expected>[[
+    "SPAN",
+    "H1",
+    ["SPAN", "H1", "DIV", "BODY", "HTML", "#document", null],
+    ["SPAN", "H1", "DIV", "BODY", "HTML", "#document", null]
+  ]]</script>
+</test-html>
+
+<test-html test="module.html">
+  <script expected>[[
+    "SPAN",
+    "H1",
+    ["SPAN", "H1", "DIV", "BODY", "HTML", "#document", null],
+    ["SPAN", "H1", "DIV", "BODY", "HTML", "#document", null]
+  ]]</script>
+</test-html>
+
+<!-- Note!! You must load the test-html component at the end -->
+<script src="https://cdn.jsdelivr.net/gh/orstavik/TestHTML@v1.0.3/TestHTML.js"></script>

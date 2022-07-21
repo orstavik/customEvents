@@ -1,0 +1,20 @@
+<div>
+  <h1>
+    <span>hello sunshine</span>
+  </h1>
+</div>
+
+<script src="../../src/customEventsSync.js"></script>
+<script>
+  const div = document.querySelector("div");
+  const h1 = document.querySelector("h1");
+  const span = document.querySelector("span");
+
+  function logEvent(e) {
+    console.log(e.target.nodeName, e.currentTarget.nodeName, e.path.map(n => n.nodeName), e.composedPath().map(n => n.nodeName));
+  }
+
+  div.addEventListener("click", e => e.defaultAction = e => console.error("should never happen"));
+  h1.addEventListener("click", e => e.defaultAction = logEvent);
+  span.click();
+</script>
