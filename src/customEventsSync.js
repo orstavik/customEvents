@@ -54,9 +54,9 @@ const filters = {
   "space": e => e.key = " ",
   "enter": e => e.key === "Enter",
   "tab": e => e.key === "tab",
-  "currentTarget": e => e.target === e.currentTarget,
-  "hostTarget": e => e.eventPhase === Event.AT_TARGET,
-  "childTarget": e => e.target.parentNode === e.currentTarget
+  "currenttarget": e => e.target === e.currentTarget,
+  "hosttarget": e => e.eventPhase === Event.AT_TARGET,
+  "childtarget": e => e.target.parentNode === e.currentTarget
 };
 
 const filteredCallbacks = new StrOMap();

@@ -1,0 +1,16 @@
+<h1>
+  <div>hello sunshine</div>
+</h1>
+
+<script type="module">
+  import {} from "../../src/customEvents.js";
+
+  const h1 = document.querySelector("h1");
+  const div = document.querySelector("div");
+  div.addEventListener("click", e=> console.log("click"));
+  h1.addEventListener("click_childtarget", e => console.log("click_childtarget"));
+  div.addEventListener("click_currenttarget", e => console.log("click_currenttarget"));
+  div.addEventListener("click_childtarget", e => console.log("oh no 1"));
+  h1.addEventListener("click_currenttarget", e => console.log("oh no 2"));
+  div.click();
+</script>
