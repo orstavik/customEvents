@@ -1,14 +1,14 @@
 <h1><a href="defaultAction/" target="_blank">defaultAction polyfish</a></h1>
-<iframe src="defaultAction/" width="100%" onload="fitHeight(event.currentTarget)"></iframe>
+<iframe src="defaultAction/" width="100%" onload="fitHeight()"></iframe>
 
 <h1><a href="filteredEvents/" target="_blank">tripple-click</a></h1>
-<iframe src="filteredEvents/" width="100%" onload="fitHeight(event.currentTarget)"></iframe>
+<iframe src="filteredEvents/" width="100%" onload="fitHeight()"></iframe>
 
 <h1><a href="tripple-click/" target="_blank">tripple-click</a></h1>
-<iframe src="tripple-click/" width="100%" onload="fitHeight(event.currentTarget)"></iframe>
+<iframe src="tripple-click/" width="100%" onload="fitHeight()"></iframe>
 
 <script>
-  function fitHeight(iframe) {
+  function fitHeight(iframe = event.currentTarget) {
     iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
   }
 </script>
