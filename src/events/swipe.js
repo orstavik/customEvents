@@ -40,27 +40,27 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
       this.onBlurListener = this.reset.bind(this);
       this.onSelectstartListener = this.reset.bind(this);
 
-      this.sequence = [];
       this.owner.addEventListener("mousedown", this.mousedownInitialListener);
       this.userSelect = this.owner.style.userSelect;
       this.owner.style.userSelect = "none";
     }
 
     reset() {
-      this.sequence = [];
+      this.owner.removeAttribute("::swipe");
       this.stopSequence();
     }
 
-    #updateState(e) {
-      this.sequence.push(e)
-      // this.owner.setAttributeNode(document.createAttribute("_swipe-" + name)); // SOME STATE IN the DOM
-    }
+    //todo 1. add an attribute observer, so that the end state reacts from this attribute.
+    //        That would enable us to test the application mid process.
+    //        when the state attribute is set from the template, this thing will still work.
+    //
+    //todo here we should add the start state?? so that all the state of the application is in the DOM??
 
     onMousedownInitial(e) {
       if (e.defaultAction || e.defaultPrevented || e.button !== 0)
         return this.reset();
-      this.#updateState(e);
       this.startSequence();
+      this.owner.setAttribute("::swipe", e.x + "," + e.y);        //todo use json here
     }
 
     onMousedownSecondary(e) {
@@ -69,14 +69,12 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
 
     onMousemove(e) {
       if (mouseOutOfBounds(e)) this.reset();
-      this.#updateState(e);
+      // this.sequence.push(e); //todo add this to the special attribute state??
     }
 
     onMouseUp(e) {
       //todo check for minDuration or maxDuration of the swipe here.
-
-      let swipeStartX = this.sequence[0].x - this.owner.offsetLeft;
-      let swipeStartY = this.sequence[0].y - this.owner.offsetTop;
+      const [swipeStartX,swipeStartY] = this.owner.getAttribute("::swipe").split(",").map(str => parseInt(str));
       let swipeDistX = swipeStartX - e.x;
       let swipeDistY = swipeStartY - e.y;
       if (!(Math.abs(swipeDistX) > Math.abs(swipeDistY) && Math.abs(swipeDistX) > minDistance || Math.abs(swipeDistY) > minDistance))
@@ -106,10 +104,9 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
     }
 
     destructor() {
+      this.reset();
+      this.owner.removeEventListener("mousedown", this.mousedownInitialListener);
       this.owner.style.userSelect = this.userSelect;
-      //todo: use this instead of .stopSequence()
-      debugger
-      // this.owner.addEventListener("mousedown", this.listener);
     }
   };
 }
