@@ -34,31 +34,28 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
   return class Swipe {
     constructor(ownerElement) {
       this.owner = ownerElement;
-      // const reset = _ => this.owner.removeAttribute("::swipe");
+      const reset = _ => this.owner.removeAttribute("::swipe");
       this.mousedownInitialListener = this.onMousedownInitial.bind(this);
-      this.mousedownSecondaryListener = this.onMousedownSecondary.bind(this);
       this.mousemoveListener = this.onMousemove.bind(this);
       this.mouseupListener = this.onMouseUp.bind(this);
-      this.onBlurListener = this.reset.bind(this);
-      this.onSelectstartListener = this.reset.bind(this);
 
       this.userSelect = this.owner.style.userSelect;
       this.owner.style.userSelect = "none";
       this.mo = new MutationObserver(() => {
         if (this.owner.hasAttribute("::swipe")) {
           this.owner.removeEventListener("mousedown", this.mousedownInitialListener);
-          this.owner.addEventListener("mousedown", this.mousedownSecondaryListener);
+          this.owner.addEventListener("mousedown", reset);
           this.owner.addEventListener("mousemove", this.mousemoveListener);
           this.owner.addEventListener("mouseup", this.mouseupListener);
-          this.owner.addEventListener("blur", this.onBlurListener);
-          this.owner.addEventListener("selectstart", this.onSelectstartListener);
+          this.owner.addEventListener("blur",reset);
+          this.owner.addEventListener("selectstart",reset);
         } else {
           this.owner.addEventListener("mousedown", this.mousedownInitialListener);
-          this.owner.removeEventListener("mousedown", this.mousedownSecondaryListener);
+          this.owner.removeEventListener("mousedown", reset);
           this.owner.removeEventListener("mousemove", this.mousemoveListener);
           this.owner.removeEventListener("mouseup", this.mouseupListener);
-          this.owner.removeEventListener("blur", this.onBlurListener);
-          this.owner.removeEventListener("selectstart", this.onSelectstartListener);
+          this.owner.removeEventListener("blur", reset);
+          this.owner.removeEventListener("selectstart", reset);
         }
       });
       this.mo.observe(this.owner, {attributeFilter: ["::swipe"]});
@@ -80,10 +77,6 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
           return this.reset();
         this.owner.setAttribute("::swipe", e.x + "," + e.y);        //todo use json here
       };
-    }
-
-    onMousedownSecondary(e) {
-      this.reset();
     }
 
     onMousemove(e) {
