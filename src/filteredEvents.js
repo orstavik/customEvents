@@ -19,7 +19,9 @@ const filters = {
   "tab": e => e.key === "tab",
   "currenttarget": e => e.target === e.currentTarget,
   "hosttarget": e => e.eventPhase === Event.AT_TARGET,
-  "childtarget": e => e.target.parentNode === e.currentTarget
+  "childtarget": e => e.target.parentNode === e.currentTarget,
+  "1": e => e.buttons === 1,
+  "outofbounds": e => e.clientY < 0 || e.clientX < 0 || e.clientX > window.innerWidth || e.clientY > window.innerHeight
 };
 
 const filteredCallbacks = new StrOMap();

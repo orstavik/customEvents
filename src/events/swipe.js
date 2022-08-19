@@ -1,8 +1,3 @@
-//todo this should be a separate filter for mousefunctions..
-function mouseOutOfBounds(trigger) {
-  return trigger.clientY < 0 || trigger.clientX < 0 || trigger.clientX > window.innerWidth || trigger.clientY > window.innerHeight;
-}
-
 class SwipeEvent extends PointerEvent {
   #options;
 
@@ -42,25 +37,27 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
       this.userSelect = this.owner.style.userSelect;
       this.owner.style.userSelect = "none";
       this.mo = new MutationObserver(() => {
-        if (this.owner.hasAttribute("::swipe")) {
-          this.owner.removeEventListener("mousedown", this.mousedownInitialListener);
-          this.owner.addEventListener("mousedown", reset);
-          this.owner.addEventListener("mousemove", this.mousemoveListener);
-          this.owner.addEventListener("mouseup", this.mouseupListener);
-          this.owner.addEventListener("blur",reset);
-          this.owner.addEventListener("selectstart",reset);
+        if (this.owner.hasAttribute("::swipe")) {                    //todo can we get conflicts when we listen for such things on the window later??
+          this.owner.removeEventListener("mousedown_1", this.mousedownInitialListener);
+          window.addEventListener("mousedown", reset);
+          window.addEventListener("mousemove", this.mousemoveListener);
+          window.addEventListener("mousemove_outofbounds", reset);
+          window.addEventListener("mouseup", this.mouseupListener);   //todo this mouseup and mousemove events should be on window now, right?
+          window.addEventListener("blur", reset);
+          window.addEventListener("selectstart", reset);
         } else {
-          this.owner.addEventListener("mousedown", this.mousedownInitialListener);
-          this.owner.removeEventListener("mousedown", reset);
-          this.owner.removeEventListener("mousemove", this.mousemoveListener);
-          this.owner.removeEventListener("mouseup", this.mouseupListener);
-          this.owner.removeEventListener("blur", reset);
-          this.owner.removeEventListener("selectstart", reset);
+          this.owner.addEventListener("mousedown_1", this.mousedownInitialListener);
+          window.removeEventListener("mousedown", reset);
+          window.removeEventListener("mousemove", this.mousemoveListener);
+          window.removeEventListener("mousemove_outofbounds", reset);
+          window.removeEventListener("mouseup", this.mouseupListener);
+          window.removeEventListener("blur", reset);
+          window.removeEventListener("selectstart", reset);
         }
       });
       this.mo.observe(this.owner, {attributeFilter: ["::swipe"]});
       if (!this.owner.hasAttribute("::swipe"))
-        this.owner.addEventListener("mousedown", this.mousedownInitialListener);
+        this.owner.addEventListener("mousedown_1", this.mousedownInitialListener);
     }
 
     reset() {
@@ -71,17 +68,11 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
     //        That would enable us to test the application mid process.
     //        when the state attribute is set from the template, this thing will still work.
 
-    onMousedownInitial(e) {
-      e.defaultAction = _ => {
-        if (e.button !== 0)  //todo this should be reverted into a filter for the mousedown.
-          return this.reset();
-        this.owner.setAttribute("::swipe", e.x + "," + e.y);        //todo use json here
-      };
+    onMousedownInitial(e) { //this shouldn't be a default action maybe, as the swipe is not passed the minDuration nor the minDistance
+      e.defaultAction = _ => this.owner.setAttribute("::swipe", e.x + "," + e.y);        //todo use json here
     }
 
     onMousemove(e) {
-      if (mouseOutOfBounds(e))
-        this.reset();
       // this.sequence.push(e); //todo add this to the special attribute state??
     }
 
@@ -90,9 +81,8 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
       const [swipeStartX, swipeStartY] = this.owner.getAttribute("::swipe").split(",").map(str => parseInt(str));
       let swipeDistX = swipeStartX - e.x;
       let swipeDistY = swipeStartY - e.y;
-      if (!(Math.abs(swipeDistX) > Math.abs(swipeDistY) && Math.abs(swipeDistX) > minDistance || Math.abs(swipeDistY) > minDistance))
-        return;
-      e.defaultAction = _ => this.owner.dispatchEvent(new SwipeEvent("swipe", {swipeDistX, swipeDistY}));
+      if (Math.abs(swipeDistX) > Math.abs(swipeDistY) && Math.abs(swipeDistX) > minDistance || Math.abs(swipeDistY) > minDistance)
+        e.defaultAction = _ => this.owner.dispatchEvent(new SwipeEvent("swipe", {swipeDistX, swipeDistY}));
       this.reset();
     }
 
