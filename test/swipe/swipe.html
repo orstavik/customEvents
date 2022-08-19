@@ -33,10 +33,10 @@
 
   viewport.addEventListener("swipe", e => {
     viewport.children[0].style.transitionDuration = "0.8s";
-    if (e.detail.direction === "right") {
+    if (e.direction.indexOf("right") >= 0) {
       viewport.children[0].style.transform = "rotate(15deg)";
       viewport.children[0].style.marginLeft = "-650px";
-    } else if (e.detail.direction === "left") {
+    } else if (e.direction.indexOf("left") >= 0) {
       viewport.children[0].style.transform = "rotate(-15deg)";
       viewport.children[0].style.marginLeft = "650px";
     } else
