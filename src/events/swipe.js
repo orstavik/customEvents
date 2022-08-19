@@ -25,7 +25,7 @@ class SwipeEvent extends PointerEvent {
   //getter for speed
 }
 
-export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}) {
+export function createSwipe({minDuration = 350, minDistance = 50, direction} = {}) {
   return class Swipe {
     constructor(ownerElement) {
       this.owner = ownerElement;
@@ -42,9 +42,9 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
           window.addEventListener("mousedown", reset);
           window.addEventListener("mousemove", this.mousemoveListener);
           window.addEventListener("mousemove_outofbounds", reset);
-          window.addEventListener("mouseup", this.mouseupListener);   //todo this mouseup and mousemove events should be on window now, right?
+          window.addEventListener("mouseup", this.mouseupListener);
           window.addEventListener("blur", reset);
-          window.addEventListener("selectstart", reset);
+          window.addEventListener("selectstart", reset);           //todo the selectstart should be on the element, right?
         } else {
           this.owner.addEventListener("mousedown_1", this.mousedownInitialListener);
           window.removeEventListener("mousedown", reset);
@@ -52,7 +52,7 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
           window.removeEventListener("mousemove_outofbounds", reset);
           window.removeEventListener("mouseup", this.mouseupListener);
           window.removeEventListener("blur", reset);
-          window.removeEventListener("selectstart", reset);
+          window.removeEventListener("selectstart", reset);       //todo the selectstart should be on the element, right?
         }
       });
       this.mo.observe(this.owner, {attributeFilter: ["::swipe"]});
@@ -64,24 +64,33 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
       this.owner.removeAttribute("::swipe");
     }
 
-    //todo 1. add an attribute observer, so that the end state reacts from this attribute.
-    //        That would enable us to test the application mid process.
-    //        when the state attribute is set from the template, this thing will still work.
-
     onMousedownInitial(e) { //this shouldn't be a default action maybe, as the swipe is not passed the minDuration nor the minDistance
-      e.defaultAction = _ => this.owner.setAttribute("::swipe", e.x + "," + e.y);        //todo use json here
+      e.defaultAction = _ => this.owner.setAttribute("::swipe", JSON.stringify([[e.x, e.y, e.timeStamp]]));
+      //todo wait with setting the defaultAction here.
+      //todo check the minDuration here using a setTimeout?? no probably not.
+
+      //1. we need to keep a record of the start event, because we need to call and check for preventDefault on it.
+      //2. in the onMousemove method, we need to check for minDuration and minDistance all the time, and that no one else calls preventDefaultAction on the start event.
+      //3. if the mousemove method finds that all is completed to make the swipe actionable, then it should trigger the third phase.
+      //   It is only in the third phase the the onMouseup will actually deliver a swipe event.
+      //   If mouseup is done before this point, then the mouseup will be a reset.
+
+      //* all this should be done in the MutationObserver, based on different content in the ::swipe setting.
     }
 
     onMousemove(e) {
+      //todo check the minDuration and minDistance here??
+      //when the swipe has passed the minDuration and the minDistance, then we should update the state again actually.
       // this.sequence.push(e); //todo add this to the special attribute state??
     }
 
     onMouseUp(e) {
       //todo check for minDuration or maxDuration of the swipe here.
-      const [swipeStartX, swipeStartY] = this.owner.getAttribute("::swipe").split(",").map(str => parseInt(str));
+      const [swipeStartX, swipeStartY, swipeStartTime] = JSON.parse(this.owner.getAttribute("::swipe"))[0];
       let swipeDistX = swipeStartX - e.x;
       let swipeDistY = swipeStartY - e.y;
-      if (Math.abs(swipeDistX) > Math.abs(swipeDistY) && Math.abs(swipeDistX) > minDistance || Math.abs(swipeDistY) > minDistance)
+      let duration = e.timeStamp - swipeStartTime;
+      if (duration > minDuration && (Math.abs(swipeDistX) > Math.abs(swipeDistY) && Math.abs(swipeDistX) > minDistance || Math.abs(swipeDistY) > minDistance))
         e.defaultAction = _ => this.owner.dispatchEvent(new SwipeEvent("swipe", {swipeDistX, swipeDistY}));
       this.reset();
     }
