@@ -53,14 +53,14 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
     //todo 1. add an attribute observer, so that the end state reacts from this attribute.
     //        That would enable us to test the application mid process.
     //        when the state attribute is set from the template, this thing will still work.
-    //
-    //todo here we should add the start state?? so that all the state of the application is in the DOM??
 
     onMousedownInitial(e) {
-      if (e.defaultAction || e.defaultPrevented || e.button !== 0)
+      e.defaultAction = _ => {
+      if (e.button !== 0)  //todo this should be reverted into a filter for the mousedown.
         return this.reset();
       this.startSequence();
       this.owner.setAttribute("::swipe", e.x + "," + e.y);        //todo use json here
+      };
     }
 
     onMousedownSecondary(e) {
@@ -74,7 +74,7 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
 
     onMouseUp(e) {
       //todo check for minDuration or maxDuration of the swipe here.
-      const [swipeStartX,swipeStartY] = this.owner.getAttribute("::swipe").split(",").map(str => parseInt(str));
+      const [swipeStartX, swipeStartY] = this.owner.getAttribute("::swipe").split(",").map(str => parseInt(str));
       let swipeDistX = swipeStartX - e.x;
       let swipeDistY = swipeStartY - e.y;
       if (!(Math.abs(swipeDistX) > Math.abs(swipeDistY) && Math.abs(swipeDistX) > minDistance || Math.abs(swipeDistY) > minDistance))
@@ -83,7 +83,7 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
       this.reset();
     }
 
-
+    //adding mutation observer when this is added?
     startSequence() {
       this.owner.removeEventListener("mousedown", this.mousedownInitialListener);
       this.owner.addEventListener("mousedown", this.mousedownSecondaryListener);
@@ -93,6 +93,7 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
       this.owner.addEventListener("selectstart", this.onSelectstartListener);
     }
 
+    //when the mutation observer registers that the thing is removed?
     //todo should we revert to pointer instead of mouse events? probably? why not?
     stopSequence() {
       this.owner.addEventListener("mousedown", this.mousedownInitialListener);
