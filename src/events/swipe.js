@@ -1,3 +1,4 @@
+//todo this should be a separate filter for mousefunctions..
 function mouseOutOfBounds(trigger) {
   return trigger.clientY < 0 || trigger.clientX < 0 || trigger.clientX > window.innerWidth || trigger.clientY > window.innerHeight;
 }
@@ -33,6 +34,7 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
   return class Swipe {
     constructor(ownerElement) {
       this.owner = ownerElement;
+      // const reset = _ => this.owner.removeAttribute("::swipe");
       this.mousedownInitialListener = this.onMousedownInitial.bind(this);
       this.mousedownSecondaryListener = this.onMousedownSecondary.bind(this);
       this.mousemoveListener = this.onMousemove.bind(this);
@@ -40,14 +42,32 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
       this.onBlurListener = this.reset.bind(this);
       this.onSelectstartListener = this.reset.bind(this);
 
-      this.owner.addEventListener("mousedown", this.mousedownInitialListener);
       this.userSelect = this.owner.style.userSelect;
       this.owner.style.userSelect = "none";
+      this.mo = new MutationObserver(() => {
+        if (this.owner.hasAttribute("::swipe")) {
+          this.owner.removeEventListener("mousedown", this.mousedownInitialListener);
+          this.owner.addEventListener("mousedown", this.mousedownSecondaryListener);
+          this.owner.addEventListener("mousemove", this.mousemoveListener);
+          this.owner.addEventListener("mouseup", this.mouseupListener);
+          this.owner.addEventListener("blur", this.onBlurListener);
+          this.owner.addEventListener("selectstart", this.onSelectstartListener);
+        } else {
+          this.owner.addEventListener("mousedown", this.mousedownInitialListener);
+          this.owner.removeEventListener("mousedown", this.mousedownSecondaryListener);
+          this.owner.removeEventListener("mousemove", this.mousemoveListener);
+          this.owner.removeEventListener("mouseup", this.mouseupListener);
+          this.owner.removeEventListener("blur", this.onBlurListener);
+          this.owner.removeEventListener("selectstart", this.onSelectstartListener);
+        }
+      });
+      this.mo.observe(this.owner, {attributeFilter: ["::swipe"]});
+      if (!this.owner.hasAttribute("::swipe"))
+        this.owner.addEventListener("mousedown", this.mousedownInitialListener);
     }
 
     reset() {
       this.owner.removeAttribute("::swipe");
-      this.stopSequence();
     }
 
     //todo 1. add an attribute observer, so that the end state reacts from this attribute.
@@ -56,10 +76,9 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
 
     onMousedownInitial(e) {
       e.defaultAction = _ => {
-      if (e.button !== 0)  //todo this should be reverted into a filter for the mousedown.
-        return this.reset();
-      this.startSequence();
-      this.owner.setAttribute("::swipe", e.x + "," + e.y);        //todo use json here
+        if (e.button !== 0)  //todo this should be reverted into a filter for the mousedown.
+          return this.reset();
+        this.owner.setAttribute("::swipe", e.x + "," + e.y);        //todo use json here
       };
     }
 
@@ -68,7 +87,8 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
     }
 
     onMousemove(e) {
-      if (mouseOutOfBounds(e)) this.reset();
+      if (mouseOutOfBounds(e))
+        this.reset();
       // this.sequence.push(e); //todo add this to the special attribute state??
     }
 
@@ -84,30 +104,13 @@ export function createSwipe({minDuration = 50, minDistance = 50, direction} = {}
     }
 
     //adding mutation observer when this is added?
-    startSequence() {
-      this.owner.removeEventListener("mousedown", this.mousedownInitialListener);
-      this.owner.addEventListener("mousedown", this.mousedownSecondaryListener);
-      this.owner.addEventListener("mousemove", this.mousemoveListener);
-      this.owner.addEventListener("mouseup", this.mouseupListener);
-      this.owner.addEventListener("blur", this.onBlurListener);
-      this.owner.addEventListener("selectstart", this.onSelectstartListener);
-    }
-
     //when the mutation observer registers that the thing is removed?
     //todo should we revert to pointer instead of mouse events? probably? why not?
-    stopSequence() {
-      this.owner.addEventListener("mousedown", this.mousedownInitialListener);
-      this.owner.removeEventListener("mousedown", this.mousedownSecondaryListener);
-      this.owner.removeEventListener("mousemove", this.mousemoveListener);
-      this.owner.removeEventListener("mouseup", this.mouseupListener);
-      this.owner.removeEventListener("blur", this.onBlurListener);
-      this.owner.removeEventListener("selectstart", this.onSelectstartListener);
-    }
-
     destructor() {
       this.reset();
       this.owner.removeEventListener("mousedown", this.mousedownInitialListener);
       this.owner.style.userSelect = this.userSelect;
+      this.mo.disconnect();
     }
   };
 }
