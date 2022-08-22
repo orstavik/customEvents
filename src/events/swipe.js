@@ -7,7 +7,7 @@ class SwipeEvent extends PointerEvent {
   }
 
   get direction() {
-    const direction = this.#options.swipeDistY > 0 ? "top" : "down";
+    const direction = this.#options.swipeDistY < 0 ? "top" : "down";
     return direction + "-" + (this.#options.swipeDistX > 0 ? "right" : "left");
   }
 
@@ -41,7 +41,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
           this.owner.removeEventListener("mousedown_1", this.mousedownInitialListener);
           window.addEventListener("mousedown", reset);
           window.addEventListener("mousemove", this.mousemoveListener);
-          window.addEventListener("mousemove_outofbounds", reset);
+          window.addEventListener("mousemove_outofbounds", reset);              //todo this is triggered, because there is no size of the window??
           window.addEventListener("mouseup", this.mouseupListener);
           window.addEventListener("blur", reset);
           window.addEventListener("selectstart", reset);           //todo the selectstart should be on the element, right?
@@ -67,7 +67,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     onMousedownInitial(e) { //this shouldn't be a default action maybe, as the swipe is not passed the minDuration nor the minDistance
       e.defaultAction = _ => this.owner.setAttribute("::swipe", JSON.stringify([[e.x, e.y, e.timeStamp]]));
       //todo wait with setting the defaultAction here.
-      //todo check the minDuration here using a setTimeout?? no probably not.
+      //todo check the minDuration here0 using a setTimeout?? no probably not.
 
       //1. we need to keep a record of the start event, because we need to call and check for preventDefault on it.
       //2. in the onMousemove method, we need to check for minDuration and minDistance all the time, and that no one else calls preventDefaultAction on the start event.
@@ -85,10 +85,9 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     }
 
     onMouseUp(e) {
-      //todo check for minDuration or maxDuration of the swipe here.
       const [swipeStartX, swipeStartY, swipeStartTime] = JSON.parse(this.owner.getAttribute("::swipe"))[0];
-      let swipeDistX = swipeStartX - e.x;
-      let swipeDistY = swipeStartY - e.y;
+      let swipeDistX = e.x - swipeStartX;
+      let swipeDistY = e.y - swipeStartY;
       let duration = e.timeStamp - swipeStartTime;
       if (duration > minDuration && (Math.abs(swipeDistX) > Math.abs(swipeDistY) && Math.abs(swipeDistX) > minDistance || Math.abs(swipeDistY) > minDistance))
         e.defaultAction = _ => this.owner.dispatchEvent(new SwipeEvent("swipe", {swipeDistX, swipeDistY}));
