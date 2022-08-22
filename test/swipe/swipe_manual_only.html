@@ -1,0 +1,59 @@
+<style>
+  #elem {
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    background-color: red;
+  }
+
+  #viewport {
+    display: inline-block;
+    width: 450px;
+    height: 450px;
+    position: relative;
+    overflow: hidden;
+    background-color: yellow;
+    margin: 10px;
+    /*margin-top: 20px;*/
+    border-radius: 10px;
+  }
+  [\:\:swipe] {
+    border-right: 5px solid black;
+  }
+</style>
+
+<div swipe id="viewport" touch-action="pan-left" pointer-distance="100">
+  <div id="elem"></div>
+</div>
+<script type="module">
+  import {} from "../../src/customEvents.js";
+  import {createSwipe} from "../../src/events/swipe.js";
+
+  customEvents.define("swipe", createSwipe());
+
+  const colorPicker = () => 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
+  const viewport = document.getElementById("viewport");
+
+  viewport.addEventListener("swipe", e => {
+    viewport.children[0].style.transitionDuration = "0.8s";
+    if (e.direction.indexOf("right") >= 0) {
+      viewport.children[0].style.transform = "rotate(15deg)";
+      viewport.children[0].style.marginLeft = "-650px";
+    } else if (e.direction.indexOf("left") >= 0) {
+      viewport.children[0].style.transform = "rotate(-15deg)";
+      viewport.children[0].style.marginLeft = "650px";
+    } else
+      return;
+
+    setTimeout(() => {
+      if (!viewport.children[0].parentNode)
+        return;
+      viewport.children[0].parentNode.removeChild(viewport.children[0]);
+      let el = document.createElement("div");
+      el.id = "elem";
+      el.transitionDuration = "1s";
+      el.style.backgroundColor = colorPicker();
+      viewport.appendChild(el);
+    }, 500);
+  });
+</script>

@@ -1,59 +1,38 @@
-<style>
-  #elem {
-    position: absolute;
-    width: 450px;
-    height: 450px;
-    background-color: red;
-  }
+<style>* {margin: 0; padding: 0;}</style>
+<h1>hello sunshine</h1>
 
-  #viewport {
-    display: inline-block;
-    width: 450px;
-    height: 450px;
-    position: relative;
-    overflow: hidden;
-    background-color: yellow;
-    margin: 10px;
-    /*margin-top: 20px;*/
-    border-radius: 10px;
-  }
-  [\:\:swipe] {
-    border-right: 5px solid black;
-  }
-</style>
-
-<div swipe id="viewport" touch-action="pan-left" pointer-distance="100">
-  <div id="elem"></div>
-</div>
 <script type="module">
   import {} from "../../src/customEvents.js";
   import {createSwipe} from "../../src/events/swipe.js";
 
-  customEvents.define("swipe", createSwipe());
+  customEvents.define("swipe", createSwipe({minDuration: 5, minDistance: 5}));
 
-  const colorPicker = () => 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
-  const viewport = document.getElementById("viewport");
+  const h1 = document.querySelector("h1");
+  h1.addEventListener("swipe", e => console.log(e.direction));
 
-  viewport.addEventListener("swipe", e => {
-    viewport.children[0].style.transitionDuration = "0.8s";
-    if (e.direction.indexOf("right") >= 0) {
-      viewport.children[0].style.transform = "rotate(15deg)";
-      viewport.children[0].style.marginLeft = "-650px";
-    } else if (e.direction.indexOf("left") >= 0) {
-      viewport.children[0].style.transform = "rotate(-15deg)";
-      viewport.children[0].style.marginLeft = "650px";
-    } else
+  const x1 = h1.offsetLeft;
+  const y1 = h1.offsetTop;
+
+  function dispatchMouse(type, clientX,clientY){
+    h1.dispatchEvent(new MouseEvent("mouse" + type, {clientX, clientY, bubbles: true, buttons:1}));
+  }
+
+  const tasks = [
+    _ => console.log(h1.hasAttribute("::swipe")),
+    _ => dispatchMouse("down", x1, y1),
+    _ => console.log(h1.hasAttribute("::swipe")),
+    _ => dispatchMouse("move", x1 + 1, y1 + 1),
+    _ => console.log(h1.hasAttribute("::swipe")),
+    _ => dispatchMouse("move", x1 + 6, y1 + 6),
+    _ => console.log(h1.hasAttribute("::swipe")),
+    _ => dispatchMouse("up", x1 + 7, y1 + 7),
+    _ => console.log(h1.hasAttribute("::swipe"))
+  ];
+  function nextTask(){
+    if(!tasks.length)
       return;
-
-    setTimeout(() => {
-      if (!viewport.children[0].parentNode)
-        return;
-      viewport.children[0].parentNode.removeChild(viewport.children[0]);
-      let el = document.createElement("div");
-      el.id = "elem";
-      el.transitionDuration = "1s";
-      el.style.backgroundColor = colorPicker();
-      viewport.appendChild(el);
-    }, 500);
-  });
+    tasks.shift()();
+    setTimeout(nextTask);
+  }
+  setTimeout(nextTask, 50);
 </script>
