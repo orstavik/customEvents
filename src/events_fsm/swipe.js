@@ -1,3 +1,5 @@
+import {EventStateMachine} from "./EventStateMachine.js";
+
 class SwipeEvent extends PointerEvent {
   #options;
 
@@ -27,7 +29,6 @@ class SwipeEvent extends PointerEvent {
 
 //todo direction is for horizontal-only / vertical-only
 //todo pointer instead of mouse event?
-import {EventStateMachine} from "./EventStateMachine.js";
 
 export function createSwipe({minDuration = 350, minDistance = 50, direction} = {}) {
   return class Swipe extends EventStateMachine {
