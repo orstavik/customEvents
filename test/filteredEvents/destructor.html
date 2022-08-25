@@ -1,22 +1,18 @@
 <h1>hello sunshine</h1>
 
 <script type="module">
-  import {} from "../../src/customEvents.js";
 
   class CountEventController {
-    #owner;
+    #el;
 
-    constructor(owner) {
-      this.#owner = owner;
-      this.#owner.setAttribute("clicks", 3);
-      owner.addEventListener("click", e => {
-        const clicks = parseInt(e.currentTarget.getAttribute("clicks"));
-        owner.setAttribute("clicks", clicks + 1);
-      })
+    constructor(el) {
+      this.#el = el;
+      el.setAttribute("clicks", 3);
+      el.addEventListener("click", e => el.setAttribute("clicks", parseInt(e.currentTarget.getAttribute("clicks")) + 1));
     }
 
     destructor() {
-      this.#owner.removeAttribute("clicks");
+      this.#el.removeAttribute("clicks");
     }
   }
 
