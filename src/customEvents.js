@@ -76,3 +76,5 @@ import {monkeyDefaultAction} from "./Event.defaultAction.js";
 })(EventTarget, addEventListener, removeEventListener);
 
 monkeyDefaultAction(Event);
+
+import {} from "./EventLoop.js";
