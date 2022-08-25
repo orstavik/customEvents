@@ -10,6 +10,7 @@ class StrOMap {
 }
 
 const filters = {
+  "prevented": e=> e.defaultPrevented || e.defaultAction,
   "shift": e => e.shiftKey,
   "meta": e => e.metaKey,
   "alt": e => e.altKey,
