@@ -116,7 +116,7 @@ class OOWeakMap extends WeakMap {
   }
 
   remove(o1, o2) {
-    return super.get(o1)?.remove(o2);
+    return super.get(o1)?.delete(o2);
   }
 }
 
@@ -147,7 +147,7 @@ function monkeypatchCustomEventsRemove(OG) {
     if (Definition) {
       let {instance, list} = customEventInstances.get(this, Definition); //only one customEventInstance with the same Definition is added to the same element.
       for (let i = 0; i < list.length; i++) {
-        let {type2, cb2, args} = list[i];
+        let {type: type2, cb: cb2, args} = list[i];
         if (type2 === type && cb2 === cb) {
           list.splice(i, 1);
           break;
@@ -158,7 +158,7 @@ function monkeypatchCustomEventsRemove(OG) {
         customEventInstances.remove(this, Definition);
       }
     }
-    customEventInstances.remove(type, this, cb)?.destructor();
+    // customEventInstances.remove(type, this, cb)?.destructor(); //old, can be deleted if no bugs arise soon.
     OG.call(this, type, cb, ...args);
   }
 }

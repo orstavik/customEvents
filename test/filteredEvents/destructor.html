@@ -1,0 +1,37 @@
+<h1>hello sunshine</h1>
+
+<script type="module">
+  import {} from "../../src/customEvents.js";
+
+  class CountEventController {
+    #owner;
+
+    constructor(owner) {
+      this.#owner = owner;
+      this.#owner.setAttribute("clicks", 3);
+      owner.addEventListener("click", e => {
+        const clicks = parseInt(e.currentTarget.getAttribute("clicks"));
+        owner.setAttribute("clicks", clicks + 1);
+      })
+    }
+
+    destructor() {
+      this.#owner.removeAttribute("clicks");
+    }
+  }
+
+  customEvents.define("count", CountEventController)
+
+  function logClicks(e) {
+    console.log(e.currentTarget.getAttribute("clicks"));
+  }
+
+  const h1 = document.querySelector("h1");
+  console.log(h1.getAttribute("clicks"));
+  h1.addEventListener("count", logClicks);
+  console.log(h1.getAttribute("clicks"));
+  h1.click();
+  console.log(h1.getAttribute("clicks"));
+  h1.removeEventListener("count", logClicks);
+  console.log(h1.getAttribute("clicks"));
+</script>
