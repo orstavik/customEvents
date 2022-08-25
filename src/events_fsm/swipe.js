@@ -28,36 +28,34 @@ class SwipeEvent extends PointerEvent {
 }
 
 //todo direction is for horizontal-only / vertical-only
-//todo pointer instead of mouse event?
 
 export function createSwipe({minDuration = 350, minDistance = 50, direction} = {}) {
   return class Swipe extends EventStateMachine {
     static fsm() {
       return {
         start: [
-          ["observe", Swipe.startObserving, "mousedown_1"]
+          ["observe", Swipe.startObserving, "pointerdown_1"]
         ],
         observe: [
-          ["start", Swipe.reset, "mousemove_prevented", window],
-          ["start", Swipe.reset, "mousemove_outofbounds", window],
+          ["start", Swipe.reset, "pointermove_prevented", window],
+          ["start", Swipe.reset, "pointermove_outofbounds", window],
 
-          ["active", Swipe.activate, "mousemove_1", window],
+          ["active", Swipe.activate, "pointermove_1", window],
 
-          ["start", Swipe.reset, "mouseup", window],
+          ["start", Swipe.reset, "pointerup", window],
           ["start", Swipe.reset, "blur", window],
           ["start", Swipe.reset, "selectstart", window],
-          ["start", Swipe.reset, "mousedown", window],
+          ["start", Swipe.reset, "pointerdown", window],
         ],
         active: [
-          ["start", Swipe.complete, "mouseup_1", window],
+          ["start", Swipe.complete, "pointerup_1", window],
 
-          ["start", Swipe.cancel, "mousemove_prevented", window],
-          ["start", Swipe.cancel, "mousemove_outofbounds", window],
-          ["start", Swipe.cancel, "mouseup", window],
+          ["start", Swipe.cancel, "pointermove_prevented", window],
+          ["start", Swipe.cancel, "pointermove_outofbounds", window],
+          ["start", Swipe.cancel, "pointerup", window],
           ["start", Swipe.cancel, "blur", window],
           ["start", Swipe.cancel, "selectstart", window],
-          ["start", Swipe.cancel, "mousedown", window],
-
+          ["start", Swipe.cancel, "pointerdown", window],
         ]
       };
     }
