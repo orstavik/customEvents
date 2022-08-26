@@ -84,8 +84,8 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
 
     static activate(e, owner) {
       let el = document.head.eventLoop.querySelector("#" + owner.getAttribute("::swipe-observe"));
-      debugger
-      const startEvent = el.event;
+      el.event;
+      const startEvent = el.event ;
       if (!Swipe.longEnough(startEvent, e))
         return false;
       owner.setAttribute("::swipe-active", document.head.eventLoop.firstChild.id);

@@ -1,25 +1,25 @@
 class EventHTMLElement extends HTMLElement {
   get event() {
-    if (!this._event) {
-      const type = this.getAttribute("type");
-      const constructor =
-        type.startsWith("mouse") ? MouseEvent :
-          type.startsWith("pointer") ? PointerEvent :
-            type.startsWith("touch") ? TouchEvent :
-              type.startsWith("key") ? KeyboardEvent :
-                Event;
-      const reconstructed = new constructor(type, {
-        x: this.getAttribute("x"),
-        y: this.getAttribute("y"),
-        key: this.getAttribute("key")
-      });
-      Object.defineProperty(reconstructed, "target", {
-        get: function () {
-          return document.querySelector(this.getAttribute("target"));
-        }
-      });
-      return this._event = reconstructed;
-    }
+    if (this._event)
+      return this._event;
+    const type = this.getAttribute("type");
+    const constructor =
+      type.startsWith("mouse") ? MouseEvent :
+        type.startsWith("pointer") ? PointerEvent :
+          type.startsWith("touch") ? TouchEvent :
+            type.startsWith("key") ? KeyboardEvent :
+              Event;
+    const reconstructed = new constructor(type, {
+      x: this.getAttribute("x"),
+      y: this.getAttribute("y"),
+      key: this.getAttribute("key")
+    });
+    Object.defineProperty(reconstructed, "target", {
+      get: function () {
+        return document.querySelector(this.getAttribute("target"));
+      }
+    });
+    return this._event = reconstructed;
   }
 
   set event(e) {
@@ -27,8 +27,9 @@ class EventHTMLElement extends HTMLElement {
       this._event = e;
   }
 
-  static create(e){
+  static create(e) {
     const el = document.createElement("event-");
+    el._event = e;
     Object.setPrototypeOf(el, EventHTMLElement.prototype);
     el.id = "e" + (id++);
     el.setAttribute("type", e.type);
@@ -38,7 +39,6 @@ class EventHTMLElement extends HTMLElement {
     e.key !== undefined && el.setAttribute("key", e.key);
     const target = e.target.tagName + (e.id === undefined ? "" : ("#" + e.id));
     el.setAttribute("target", target);
-    el._event = e;
     return el;
   }
 }
@@ -67,10 +67,10 @@ export function monkeypatchEventLoopElement_add(OG) {
     let wrapped = listenListen.get(cb);
     if (!wrapped) {
       wrapped = function eventListenerWithWrapper(e) {
-        if(!seen.has(e)){
+        if (!seen.has(e)) {
           seen.add(e);
           document.head.eventLoop.put(e);
-        };
+        }
         cb(e);
       }
       listenListen.set(cb, wrapped);

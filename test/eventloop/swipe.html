@@ -7,7 +7,6 @@
 
   customEvents.define("swipe", createSwipe({minDuration: 5, minDistance: 5}));
 
-  debugger
   const h1 = document.querySelector("h1");
   h1.addEventListener("swipe", e => console.log(e.direction));
 
