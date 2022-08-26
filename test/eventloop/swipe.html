@@ -1,0 +1,41 @@
+<style>* {margin: 0; padding: 0;}</style>
+<h1>hello sunshine</h1>
+
+<script type="module">
+  import {} from "../../src/customEvents_Loop.js";
+  import {createSwipe} from "../../src/events_fsm_eventloop/swipe.js";
+
+  customEvents.define("swipe", createSwipe({minDuration: 5, minDistance: 5}));
+
+  debugger
+  const h1 = document.querySelector("h1");
+  h1.addEventListener("swipe", e => console.log(e.direction));
+
+  const x1 = h1.offsetLeft;
+  const y1 = h1.offsetTop;
+
+  function dispatchMouse(type, clientX, clientY) {
+    h1.dispatchEvent(new PointerEvent("pointer" + type, {clientX, clientY, bubbles: true, buttons: 1}));
+  }
+
+  const tasks = [
+    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active")),
+    _ => dispatchMouse("down", x1, y1),
+    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active")),
+    _ => dispatchMouse("move", x1 + 1, y1 + 1),
+    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active")),
+    _ => dispatchMouse("move", x1 + 6, y1 + 6),
+    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active")),
+    _ => dispatchMouse("up", x1 + 7, y1 + 7),
+    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active"))
+  ];
+
+  function nextTask() {
+    if (!tasks.length)
+      return;
+    tasks.shift()();
+    setTimeout(nextTask, 5);
+  }
+
+  setTimeout(nextTask, 50);
+</script>
