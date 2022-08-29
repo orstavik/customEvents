@@ -1,4 +1,7 @@
 <style>* {margin: 0; padding: 0;}</style>
+<style>
+  [\:\:swipe-observe]{background: yellowgreen;}
+</style>
 <h1>hello sunshine</h1>
 
 <script type="module">
@@ -17,16 +20,20 @@
     h1.dispatchEvent(new PointerEvent("pointer" + type, {clientX, clientY, bubbles: true, buttons: 1}));
   }
 
+  function log() {
+    console.log([...h1.attributes].map(a => `${a.name}="${a.value}"`));
+  }
+
   const tasks = [
-    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active")),
+    log,
     _ => dispatchMouse("down", x1, y1),
-    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active")),
+    log,
     _ => dispatchMouse("move", x1 + 1, y1 + 1),
-    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active")),
+    log,
     _ => dispatchMouse("move", x1 + 6, y1 + 6),
-    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active")),
+    log,
     _ => dispatchMouse("up", x1 + 7, y1 + 7),
-    _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active"))
+    log,
   ];
 
   function nextTask() {
