@@ -1,0 +1,51 @@
+<h1>hello sunshine</h1>
+<script type="module">
+  import {monkeyDefaultAction, nextTick} from "../../src/Event.defaultAction.js";
+
+  monkeyDefaultAction(Event);
+
+  //a => b,c,d
+  //b => b1,b2,b3
+  //c => c1,c2
+
+  //what should be the sequence of events?
+  //a,b,b1,b2,b3,c,c1,c2,d
+  //but there is no way to achieve that, so the sequence is:
+  //a,b,b1,b2,c,c1,b3,c2,d
+
+  function a(e) {
+    console.log("a");
+    e.target.dispatchEvent(new Event("b", e));
+    nextTick(_ => {
+      e.target.dispatchEvent(new Event("c", e))
+      nextTick(_ => e.target.dispatchEvent(new Event("d", e)));
+    });
+  }
+
+  function b(e) {
+    console.log("b");
+    e.target.dispatchEvent(new Event("b1", e));
+    nextTick(_ => {
+      e.target.dispatchEvent(new Event("b2", e));
+      nextTick(_ => e.target.dispatchEvent(new Event("b3", e)))
+    });
+  }
+
+  function c(e) {
+    console.log("c");
+    e.target.dispatchEvent(new Event("c1", e));
+    nextTick(_ => e.target.dispatchEvent(new Event("c2", e)));
+  }
+
+  const h1 = document.querySelector("h1");
+  h1.addEventListener("a", a);
+  h1.addEventListener("b", b);
+  h1.addEventListener("c", c);
+  h1.addEventListener("b1", e => console.log(e.type));
+  h1.addEventListener("b2", e => console.log(e.type));
+  h1.addEventListener("b3", e => console.log(e.type));
+  h1.addEventListener("c1", e => console.log(e.type));
+  h1.addEventListener("c2", e => console.log(e.type));
+  h1.addEventListener("d", e => console.log(e.type));
+  h1.dispatchEvent(new Event("a", {bubbles: true}));
+</script>
