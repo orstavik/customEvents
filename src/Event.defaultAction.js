@@ -8,7 +8,7 @@ function rewind(event, currentTarget, target, path, composedPath) {
   });
 }
 
-function nextTick(cb){
+export function nextTick(cb){
   const audio = document.createElement("audio");
   audio.onratechange = cb;
   audio.playbackRate = 2;
