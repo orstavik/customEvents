@@ -1,9 +1,6 @@
 <test-html test="current_child_target.html">
-  <script expected>[
-    "click",
-    "click_currenttarget",
-    "click_childtarget"
-  ]
+  <script expected>
+    ["filters added", "click", "click_currenttarget", "click_childtarget", "filters removed", "click"]
   </script>
 </test-html>
 <test-html test="prevented.html">

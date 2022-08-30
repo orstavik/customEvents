@@ -1,6 +1,6 @@
 const events = {};
 
-window.customEvents = {};
+window.customEvents ??= {};
 customEvents.define = function (str, Class) {
   if (str in events)
     throw str + " is already defined as a custom event.";

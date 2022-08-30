@@ -3,6 +3,8 @@
 <script type="module">
   import {} from "../../src/customEvents.js";
 
+  // customEvents.defineFilter("prevented", e => e.defaultPrevented);
+
   const h1 = document.querySelector("h1");
   h1.addEventListener("click", e => console.log(e.defaultPrevented));
   h1.addEventListener("click_prevented", e => console.log("error, this event listener should be filtered away."));

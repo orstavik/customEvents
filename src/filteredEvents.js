@@ -25,6 +25,13 @@ const filters = {
   "outofbounds": e => e.clientY < 0 || e.clientX < 0 || e.clientX > window.innerWidth || e.clientY > window.innerHeight
 };
 
+window.customEvents ??= {};
+customEvents.defineFilter = function(key, func){
+  if(filters[key])
+    throw key + " is already declared as an event filter.";
+  filters[key] = func;
+};
+
 const filteredCallbacks = new StrOMap();
 
 export function monkeypatchFilteredEvents_add(OG) {
