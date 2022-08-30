@@ -1,0 +1,41 @@
+<div id="parent">
+  <h1 id="child">hello sunshine</h1>
+</div>
+
+<script type="module">
+  import {} from "../../src/customEvents.js";
+  import {TrippleClick} from "../../src/events/tripple-click.js";
+
+  customEvents.define("tripple-click", TrippleClick);
+  const parent = document.querySelector("#parent");
+  const child = document.querySelector("#child");
+
+  function log(e) {
+    console.log(e.type, e.target.id);
+  }
+
+  document.body.addEventListener("click", log);
+  document.body.addEventListener("tripple-click", log);
+
+  //todo I should not need these tripple-click event listeners, as the one on document.body is global and could replace them both
+  parent.addEventListener("tripple-click", _ => "do nothing");  //adding empty listeners to add the event controller
+  child.addEventListener("tripple-click", _ => "do nothing");   //adding empty listeners to add the event controller
+
+  child.click();
+  parent.click();
+  child.click();
+  //tripple-click parent
+  setTimeout(() => {
+    child.click();
+    child.click();
+    console.log("wait for it");
+  }, 10);
+  setTimeout(() => {
+    child.click();
+    //tripple-click parent
+  }, 20);
+
+  //this should trigger a tripple-click on the parent
+  //and reset the state on both the body and the child
+
+</script>
