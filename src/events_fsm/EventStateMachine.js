@@ -23,9 +23,9 @@ function makeListener(seen, machine, owner, state, nextState, action) {
     if (action(e, owner) === false)
       return;
     seen.add(e);
-    for (let [listener, , , event, target = owner] of machine[state])
+    for (let [listener, , , event, target] of machine[state])
       target.removeEventListener(event, listener);
-    for (let [listener, , , event, target = owner] of machine[nextState])
+    for (let [listener, , , event, target] of machine[nextState])
       target.addEventListener(event, listener);
   }
 }
