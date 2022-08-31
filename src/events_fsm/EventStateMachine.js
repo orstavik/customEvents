@@ -35,11 +35,14 @@ export class EventStateMachine {
     const seen = new WeakSet();
     const machine = this.constructor.fsm();
     //making the listeners. This can be done during the definition stage.
-    for (let state in machine)
-      for (let list of machine[state])
+    for (let state in machine) {
+      for (let list of machine[state]) {
+        list.length === 3 && list.push(owner);
         list.unshift(makeListener(seen, machine, owner, state, ...list));
+      }
+    }
     //starting the first listeners
-    for (let [listener, , , event, target = owner] of machine[Object.keys(machine)[0]])
+    for (let [listener, , , event, target] of machine[Object.keys(machine)[0]])
       target.addEventListener(event, listener);
   }
 
