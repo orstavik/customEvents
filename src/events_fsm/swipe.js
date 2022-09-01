@@ -9,8 +9,7 @@ class SwipeEvent extends PointerEvent {
   }
 
   get direction() {
-    const direction = this.#options.swipeDistY < 0 ? "top" : "down";
-    return direction + "-" + (this.#options.swipeDistX > 0 ? "right" : "left");
+    return (this.#options.swipeDistY < 0 ? "top" : "down") + "-" + (this.#options.swipeDistX > 0 ? "right" : "left");
   }
 
   //step 1 would be to make it in degrees? turn two sets of coordinates into a degree
@@ -37,9 +36,9 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
           ["observe", Swipe.startObserving, "pointerdown_1"]
         ],
         observe: [
-          ["start", Swipe.reset, "pointermove_prevented", window],
-          ["start", Swipe.reset, "pointermove_outofbounds", window],
-
+          ["start", Swipe.reset, "pointermove_prevented", window],          //this check should be done after the propagation has finished too..
+          ["start", Swipe.reset, "pointermove_outofbounds", window],        //this event controller needs to react to the preventDefault on the pointer move,
+                                                                            //also when this is called later in the propagation hierarchy.
           ["active", Swipe.activate, "pointermove_1", window],
 
           ["start", Swipe.reset, "pointerup", window],
@@ -65,13 +64,11 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
         Math.abs(now.x - start.x) > minDistance || Math.abs(now.y - start.y) > minDistance;
     }
 
-    #owner;
-
     constructor(owner) {
       super(owner);
-      this.#owner = owner;
       owner.style.setProperty("--userSelectDefault", owner.style.userSelect);
       owner.style.userSelect = "none";
+      super.init();
     }
 
     static startObserving(e, owner) {
@@ -100,13 +97,15 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
         const startEvent = EventLoop.get(owner.getAttribute("::swipe-observe"));
         owner.removeAttribute("::swipe-observe");
         owner.removeAttribute("::swipe-active");
+        //dispatch swipe on the target of e.              //todo we need to have a context object, because we need to remember the target of the first down event.
         owner.dispatchEvent(new SwipeEvent("swipe", {swipeDistX: e.x - startEvent.x, swipeDistY: e.y - startEvent.y}))
       }
     }
 
     destructor() {
-      this.#owner.style.userSelect = this.#owner.style.setProperty("--userSelectDefault");
-      this.#owner.style.removeProperty("--userSelectDefault");
+      super.destructor();
+      this.owner.style.userSelect = this.owner.style.getPropertyValue("--userSelectDefault");
+      this.owner.style.removeProperty("--userSelectDefault");
     }
   };
 }

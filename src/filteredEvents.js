@@ -9,8 +9,9 @@ class StrOMap {
   }
 }
 
+//todo the problem here is wording conflicts. How do we avoid naming conflicts here without having a whole lot of back and forth.
 const filters = {
-  "prevented": e=> e.defaultPrevented || e.defaultAction,
+  "prevented": e=> e.defaultPrevented || e.defaultAction,//todo this isn't prevented, this is "default action unavailable".
   "shift": e => e.shiftKey,
   "meta": e => e.metaKey,
   "alt": e => e.altKey,
@@ -44,7 +45,7 @@ export function monkeypatchFilteredEvents_add(OG) {
     if (!wrapped) {
       wrapped = function eventListenerFilter(e) {
         for (let f of filter)
-          if (f in filters && !filters[f](e))
+          if (f in filters && !filters[f](e))              //todo throw an Error if there is no such filter.
             return;
         cb.call(this, e);
       };

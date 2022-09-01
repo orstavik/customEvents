@@ -16,40 +16,54 @@
  *       B2. cancellation steps are commonly added as new macro tasks in the event loop using nextTick (not as default actions).
  */
 
-function makeListener(seen, machine, owner, state, nextState, action) {
-  return function (e) {
-    if (seen.has(e))
-      return;
-    if (action(e, owner) === false)
-      return;
-    seen.add(e);
-    for (let [listener, , , event, target] of machine[state])
-      target.removeEventListener(event, listener);
-    for (let [listener, , , event, target] of machine[nextState])
-      target.addEventListener(event, listener);
-  }
-}
-
 export class EventStateMachine {
+  #nowState;
+  #stateToListenerDict;
+  #seenEvents = new WeakSet();
+
   constructor(owner) {
-    const seen = new WeakSet();
-    const machine = this.constructor.fsm();
-    //making the listeners. This can be done during the definition stage.
-    for (let state in machine) {
-      for (let list of machine[state]) {
+    this.#stateToListenerDict = this.constructor.fsm();
+    this.owner = owner;
+    this.#prepareStateMachine(owner);
+  }
+
+  //adding the owner as the target.
+  //making the listeners. This can be done during the definition stage.
+  #prepareStateMachine(owner) {
+    for (let state in this.#stateToListenerDict) {
+      for (let list of this.#stateToListenerDict[state]) {
         list.length === 3 && list.push(owner);
-        list.unshift(makeListener(seen, machine, owner, state, ...list));
+        list.push(this.#makeListener(list.shift(), list.shift()));
       }
     }
-    //starting the first listeners
-    for (let [listener, , , event, target] of machine[Object.keys(machine)[0]])
-      target.addEventListener(event, listener);
   }
 
-  destructor(){
-    //todo remove the event listeners on the machine[state] currently active.
-    // for (let [listener, , , event, target = owner] of machine[currentState])
-    //   target.removeEventListener(event, listener);
-    //todo we need to have the machine and the currentState as this.xyz. If not, we can't cleanup.
+  #makeListener(nextState, action) {
+    return e => {
+      if (this.#seenEvents.has(e))
+        return;
+      if (action(e, this.owner) === false)
+        return;
+      this.#seenEvents.add(e);
+      this.#transition(nextState);
+    }
+  }
+
+  #transition(nextState) {
+    if (this.#nowState)
+      for (let [event, target, listener] of this.#stateToListenerDict[this.#nowState])
+        target.removeEventListener(event, listener);
+    this.#nowState = nextState;
+    if (this.#nowState)
+      for (let [event, target, listener] of this.#stateToListenerDict[this.#nowState])
+        target.addEventListener(event, listener);
+  }
+
+  init(startState = Object.keys(this.#stateToListenerDict)[0]) {
+    this.#transition(startState);
+  }
+
+  destructor() {
+    this.#transition();
   }
 }
