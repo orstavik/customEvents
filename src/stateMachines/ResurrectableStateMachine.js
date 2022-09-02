@@ -9,8 +9,8 @@ export function PersistStateMachine(Base) {
   return class PersistentStateMachine extends Base {
     #meta;
 
-    constructor(prefix, owner) {
-      super(prefix, owner);
+    constructor(owner, prefix) {
+      super(owner, prefix);
       if (!owner.isConnected)
         throw new Error("PersistentEventStateMachines can only be added to elements already connected to the DOM.");
       let uid;

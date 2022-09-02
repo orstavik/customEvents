@@ -36,7 +36,7 @@ function monkeypatchCustomEventsAdd(OG) {
       //only one customEventInstance with the same Definition is added to the same element.
       let {instance, list} = customEventInstances.get(this, Definition) || {};
       if (!instance) {
-        instance = new Definition(this), list = [];
+        instance = new Definition(this, type), list = [];
         customEventInstances.set(this, Definition, {instance, list});
       }
       list.push({type, cb, args});

@@ -6,7 +6,7 @@ export class NodeStateMachine {
   #uid;
   #prefix;
 
-  constructor(prefix, owner) {
+  constructor(owner, prefix) {
     this.#prefix = prefix;
     this.#owner = owner;
     this.#hosts = NodeStateMachine.hostChain(owner);

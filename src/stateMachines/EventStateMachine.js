@@ -27,8 +27,8 @@ export function EventStateMachine(Base) {
     #seenEvents = new WeakSet();
     #_stateToListenerDict;
 
-    constructor(prefix, owner) {
-      super(prefix, owner);
+    constructor(owner, prefix) {
+      super(owner, prefix);
       if (!this.state)  //if no superclass has triggered enterState, then do so using the first state in the list.
         this.enterState(Object.keys(this.#stateToListenerDict)[0]);
     }

@@ -47,8 +47,8 @@ export function PseudoAttributesStateMachine(Base) {
   return class PseudoHostStateMachine extends Base {
     #pseudoPrefix;
 
-    constructor(prefix, owner) {
-      super(prefix, owner);
+    constructor(owner, prefix) {
+      super(owner, prefix);
       if (!this.constructor.pseudoAttributes)
         throw "There is no point in having a PseudoHostStateMachine if the final implementation doesn't have any pseudoAttributes";
       this.#pseudoPrefix = "::" + prefix + "-";
