@@ -1,5 +1,5 @@
-<style>* {margin: 0; padding: 0;}</style>
 <h1 id="one">hello sunshine</h1>
+<style>* {margin: 0; padding: 0;}</style>
 
 <script type="module">
   import {} from "../../src/customEvents.js";
@@ -19,21 +19,26 @@
     h1.dispatchEvent(new PointerEvent("pointer" + type, {clientX, clientY, bubbles: true, buttons: 1}));
   }
 
+  function log(){
+    console.log(h1.outerHTML);
+    console.log(document.head.innerHTML);
+  }
+
   const tasks = [
-    _ => console.log(h1.getAttribute("::swipe"), h1.style.userSelect),
+    log,
     _ => h1.addEventListener("swipe", swipeListener),
-    _ => console.log(h1.getAttribute("::swipe"), h1.style.userSelect),
+    log,
     _ => dispatchMouse("down", x1, y1),
-    _ => console.log(h1.getAttribute("::swipe"), h1.style.userSelect),
+    log,
     _ => dispatchMouse("move", x1 + 1, y1 + 1),
-    _ => console.log(h1.getAttribute("::swipe"), h1.style.userSelect),
+    log,
     // _ => console.error(document.documentElement.outerHTML),
     _ => dispatchMouse("move", x1 + 6, y1 + 6),
-    _ => console.log(h1.getAttribute("::swipe"), h1.style.userSelect),
+    log,
     _ => dispatchMouse("up", x1 + 7, y1 + 7),
-    _ => console.log(h1.getAttribute("::swipe"), h1.style.userSelect),
-    // _ => h1.removeEventListener("swipe", swipeListener),
-    // _ => console.log(h1.hasAttribute("::swipe-observe"), h1.hasAttribute("::swipe-active"), h1.style.userSelect)
+    log,
+    _ => h1.removeEventListener("swipe", swipeListener),
+    log,
   ];
 
   function nextTask() {

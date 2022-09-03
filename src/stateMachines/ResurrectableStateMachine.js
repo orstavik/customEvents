@@ -9,26 +9,32 @@ export function PersistStateMachine(Base) {
   return class PersistentStateMachine extends Base {
     #meta;
 
-    constructor(owner, prefix) {
-      super(owner, prefix);
-      if (!owner.isConnected)
+    #verifyPersistability(){
+      if (!this.owner.isConnected)
         throw new Error("PersistentEventStateMachines can only be added to elements already connected to the DOM.");
-      let uid;
       try {
-        uid = this.uid;
+        this.uid;
       } catch (err) {
+        //todo this might not be persistable if a shadowDom gives IDs dynamically during construction.
+        // This will only work if IDs are assigned to elements in shadowDOM so that the same elements
+        // get the same ID whenever it is reconstructed.
         throw new Error("PersistentEventStateMachines can only be added to elements with an id for all host nodes.");
       }
-      this.#meta = document.head.querySelector(`:scope > meta-${prefix}[uid=${uid}]`);
+    }
+
+    constructor(owner, prefix) {
+      super(owner, prefix);
+      this.#verifyPersistability();
+      this.#meta = document.head.querySelector(`:scope > meta-${prefix}[uid=${(this.uid)}]`);
       if (this.#meta) {
         if (resurrectedMetaElements.has(this.#meta))
           throw "Recovering meta element with the same type and uid as another state machine. Rapport this bug and it will be fixed.";
         resurrectedMetaElements.add(this.#meta);
-        //todo this is too soon, the subclasses aren't setup. So, do we delay this in a prt??
+        //todo problem, superclass constructor calling method on this (running from subclasses), before the subclass constructor is created.
         this.enterState(this.#meta.getAttribute("state"), this.#meta.innerText === "" ? undefined : JSON.parse(this.#meta.innerText));
       } else {
         this.#meta = document.createElement(`meta-${prefix}`);
-        this.#meta.setAttribute("uid", uid);
+        this.#meta.setAttribute("uid", this.uid);
         document.head.append(this.#meta);
       }
     }
@@ -36,7 +42,7 @@ export function PersistStateMachine(Base) {
     enterState(state, value) {
       super.enterState(state, value);
       this.#meta.setAttribute("state", state);
-      this.#meta.innerText = JSON.stringify(value);
+      this.#meta.innerText = value === undefined ? "" : JSON.stringify(value);
     }
 
     destructor() {
