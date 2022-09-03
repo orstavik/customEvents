@@ -11,42 +11,34 @@
   const x1 = h1.offsetLeft;
   const y1 = h1.offsetTop;
 
-  function swipeListener(e) {
-    console.log(e.type, e.direction);
-  }
-
   function dispatchMouse(type, clientX, clientY) {
     h1.dispatchEvent(new PointerEvent("pointer" + type, {clientX, clientY, bubbles: true, buttons: 1}));
   }
 
-  function log(){
-    console.log(h1.outerHTML);
-    console.log(document.head.innerHTML);
-  }
-
+  const swipeListener = e => console.log(e.type, e.direction);
   const tasks = [
-    log,
     _ => h1.addEventListener("swipe", swipeListener),
-    log,
     _ => dispatchMouse("down", x1, y1),
-    log,
     _ => dispatchMouse("move", x1 + 1, y1 + 1),
-    log,
     // _ => console.error(document.documentElement.outerHTML),
     _ => dispatchMouse("move", x1 + 6, y1 + 6),
-    log,
     _ => dispatchMouse("up", x1 + 7, y1 + 7),
-    log,
     _ => h1.removeEventListener("swipe", swipeListener),
-    log,
   ];
 
   function nextTask() {
     if (!tasks.length)
       return;
     tasks.shift()();
+    log();
     setTimeout(nextTask, 5);
   }
 
+  function log() {
+    console.log(h1.outerHTML);
+    console.log(document.head.innerHTML);
+  }
+
+  log();
   setTimeout(nextTask, 50);
 </script>
