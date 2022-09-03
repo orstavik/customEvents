@@ -63,7 +63,7 @@ export function EventStateMachine(Base) {
 
     destructor() {
       //super.destructor() will remove this.state, and
-      //therefore the sub class must run this functionality before the super class.
+      //therefore the subclass must run this functionality before the superclass.
       for (let [event, target, listener] of this.#stateToListenerDict[this.state])
         target.removeEventListener(event, listener);
       super.destructor();
