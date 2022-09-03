@@ -15,7 +15,7 @@
     h1.dispatchEvent(new PointerEvent("pointer" + type, {clientX, clientY, bubbles: true, buttons: 1}));
   }
 
-  const swipeListener = e => console.log(e.type, e.direction);
+  const swipeListener = e => (console.log(e.type, e.direction), console.info(e.duration));
   const tasks = [
     _ => h1.addEventListener("swipe", swipeListener),
     _ => dispatchMouse("down", x1, y1),

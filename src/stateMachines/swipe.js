@@ -6,15 +6,22 @@ import {EventStateMachine} from "./EventStateMachine.js";
 const EventStateMachine_resurrectable_reflective = EventStateMachine(ReflectStateMachine(PersistStateMachine(NodeStateMachine)));
 
 class SwipeEvent extends PointerEvent {
-  #options;
+  #start;
+  #end;
 
-  constructor(type, options) {
+  constructor(type, {start, end}) {
     super(type, {bubbles: true, composed: true});
-    this.#options = options;
+    this.#start = start;
+    this.#end = end;
   }
 
   get direction() {
-    return (this.#options.swipeDistY < 0 ? "top" : "down") + "-" + (this.#options.swipeDistX > 0 ? "right" : "left");
+    return (this.#end.y - this.#start.y < 0 ? "top" : "down") +
+      "-" + (this.#end.x - this.#start.x > 0 ? "right" : "left");
+  }
+
+  get duration() {
+    return this.#end.timeStamp - this.#start.timeStamp;
   }
 
   //step 1 would be to make it in degrees? turn two sets of coordinates into a degree
@@ -92,10 +99,13 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
       nextTick(_ => owner.dispatchEvent(new SwipeEvent("swipecancel", {reason: e.type})));
     }
 
-    static complete(e, owner, state) {
-      e.defaultAction = _ => {
-        owner.dispatchEvent(new SwipeEvent("swipe", {swipeDistX: e.x - state.x, swipeDistY: e.y - state.y, duration: e.timeStamp - state.timeStamp}));
-      }
+    static complete(end, owner, start) {
+      //todo here we would like the swipe event to be dispatched from the start.target.
+      // this means that we need to preserve the event element as an object in the state,
+      // and as a reference to an <event-> element in the <event-loop> in the meta-swipe element.
+      // this will also cause the reconstruction to create an Event object that can be called preventDefault() on
+      // and that will
+      end.defaultAction = _ => owner.dispatchEvent(new SwipeEvent("swipe", {start, end}))
     }
 
     destructor() {
