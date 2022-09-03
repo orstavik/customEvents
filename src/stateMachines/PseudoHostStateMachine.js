@@ -42,19 +42,18 @@ export function PseudoAttributesStateMachine(Base) {
   NodeStateMachine.protoInstanceOf(Base);
 
   return class PseudoHostStateMachine extends Base {
-    #pseudoPrefix;
 
-    constructor(owner, prefix) {
-      super(owner, prefix);
+    //todo this can be done in a define callback instead.
+    constructor(owner) {
+      super(owner);
       if (!this.constructor.pseudoAttributes)
         throw "There is no point in having a PseudoHostStateMachine if the final implementation doesn't have any pseudoAttributes";
-      this.#pseudoPrefix = "::" + prefix + "-";
     }
 
     enterState(state, value) {
       super.enterState(state, value);
       for (let pseudo of this.constructor.pseudoAttributes) {
-        const type = this.#pseudoPrefix + pseudo;
+        const type = `::${this.prefix}-${pseudo}`;
         for (let el of this.hosts)
           value?.[pseudo] === undefined ? el.removeAttribute(type) : el.setAttribute(type, value[pseudo]);
       }
@@ -63,7 +62,7 @@ export function PseudoAttributesStateMachine(Base) {
     destructor() {
       super.destructor();
       for (let pseudo of this.constructor.pseudoAttributes) {
-        const type = this.#pseudoPrefix + pseudo;
+        const type = `::${this.prefix}-${pseudo}`;
         for (let el of this.hosts)
           el.removeAttribute(type);
       }

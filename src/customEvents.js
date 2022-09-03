@@ -1,9 +1,14 @@
 const events = {};
-
+const definedEventControllers = new WeakMap();
 window.customEvents ??= {};
 customEvents.define = function (str, Class) {
   if (str in events)
     throw str + " is already defined as a custom event.";
+  if (definedEventControllers.has(Class))
+    throw `${Class.name} is already defined as "${definedEventControllers.get(Class)}". 
+    What about 'customEvents.define("${str}", class Something extends ${Class.name}{});'?`;
+  definedEventControllers.set(Class, str);
+  Class.prefix = str;
   events[str] = Class;
 };
 

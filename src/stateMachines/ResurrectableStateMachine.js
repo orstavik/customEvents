@@ -21,10 +21,10 @@ export function PersistStateMachine(Base) {
       }
     }
 
-    constructor(owner, prefix) {
-      super(owner, prefix);
+    constructor(owner) {
+      super(owner);
       this.#verifyPersistability();
-      this.#meta = document.head.querySelector(`:scope > meta-${prefix}[uid=${(this.uid)}]`);
+      this.#meta = document.head.querySelector(`:scope > meta-${this.prefix}[uid=${(this.uid)}]`);
       if (this.#meta) {
         if (resurrectedMetaElements.has(this.#meta))
           throw "Recovering meta element with the same type and uid as another state machine. Rapport this bug and it will be fixed.";
@@ -32,7 +32,7 @@ export function PersistStateMachine(Base) {
         //todo problem, superclass constructor calling method on this (running from subclasses), before the subclass constructor is created.
         this.enterState(this.#meta.getAttribute("state"), this.#meta.innerText === "" ? undefined : JSON.parse(this.#meta.innerText));
       } else {
-        this.#meta = document.createElement(`meta-${prefix}`);
+        this.#meta = document.createElement(`meta-${this.prefix}`);
         this.#meta.setAttribute("uid", this.uid);
         document.head.append(this.#meta);
       }

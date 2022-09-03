@@ -4,16 +4,14 @@ export class NodeStateMachine {
   #stateValue;
   #state;
   #uid;
-  #prefix;
 
-  constructor(owner, prefix) {
-    this.#prefix = prefix;
+  constructor(owner) {
     this.#owner = owner;
     this.#hosts = NodeStateMachine.hostChain(owner);
   }
 
   get prefix() {
-    return this.#prefix;
+    return this.constructor.prefix;
   }
 
   get hosts() {

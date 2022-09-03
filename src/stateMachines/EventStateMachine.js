@@ -25,8 +25,8 @@ export function EventStateMachine(Base) {
     #seenEvents = new WeakSet();
     #_stateToListenerDict;
 
-    constructor(owner, prefix) {
-      super(owner, prefix);
+    constructor(owner) {
+      super(owner);
       if (!this.state)  //if no superclass has triggered enterState, then do so using the first state in the list.
         this.enterState(Object.keys(this.#stateToListenerDict)[0]);
     }
@@ -73,7 +73,7 @@ export function EventStateMachine(Base) {
       return e => {
         if (this.#seenEvents.has(e))
           return;
-        const nextStateValue = action(e, this.owner, this.stateValue);
+        const nextStateValue = action.call(this, e, this.owner, this.stateValue);
         if (nextStateValue === false)   //todo make the next state value from false to undefined, or throw??
           return;
         this.#seenEvents.add(e);

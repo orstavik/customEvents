@@ -76,8 +76,8 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
         Math.abs(now.x - start.x) > minDistance || Math.abs(now.y - start.y) > minDistance;
     }
 
-    constructor(owner, prefix) {
-      super(owner, prefix);
+    constructor(owner) {
+      super(owner);
       owner.style.setProperty("--userSelectDefault", owner.style.userSelect);
       owner.style.userSelect = "none";
     }
@@ -96,7 +96,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     }
 
     static cancel(e, owner, state) {
-      nextTick(_ => owner.dispatchEvent(new SwipeEvent("swipecancel", {reason: e.type})));
+      nextTick(_ => owner.dispatchEvent(new SwipeEvent(this.prefix + "cancel", {reason: e.type})));
     }
 
     static complete(end, owner, start) {
@@ -105,7 +105,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
       // and as a reference to an <event-> element in the <event-loop> in the meta-swipe element.
       // this will also cause the reconstruction to create an Event object that can be called preventDefault() on
       // and that will
-      end.defaultAction = _ => owner.dispatchEvent(new SwipeEvent("swipe", {start, end}))
+      end.defaultAction = _ => owner.dispatchEvent(new SwipeEvent(this.prefix, {start, end}))
     }
 
     destructor() {
