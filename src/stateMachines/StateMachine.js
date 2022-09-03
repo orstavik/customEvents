@@ -67,4 +67,9 @@ export class NodeStateMachine {
     }
     return res;
   }
+
+  static protoInstanceOf(Base) {
+    if (Base !== this && !(Base.prototype instanceof this))
+      throw new TypeError(`${Base.name} is not a subclass of ${this.name}.`);
+  }
 }

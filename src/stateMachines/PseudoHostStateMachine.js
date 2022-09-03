@@ -1,8 +1,7 @@
 import {NodeStateMachine} from "./StateMachine.js";
 
 export function ReflectStateMachine(Base) {
-  if (Base !== NodeStateMachine && !(Base.prototype instanceof NodeStateMachine))
-    throw new Error("ReflectHostsStateMachine only accepts a Base that is a NodeStateMachine.");
+  NodeStateMachine.protoInstanceOf(Base);
 
   return class ReflectStateMachine extends Base {
     enterState(state, value) {
@@ -18,8 +17,7 @@ export function ReflectStateMachine(Base) {
 }
 
 export function ReflectHostsStateMachine(Base) {
-  if (Base !== NodeStateMachine && !(Base.prototype instanceof NodeStateMachine))
-    throw new Error("ReflectHostsStateMachine only accepts a Base that is a NodeStateMachine.");
+  NodeStateMachine.protoInstanceOf(Base);
 
   return class ReflectHostsStateMachine extends Base {
     enterState(state, value) {
@@ -41,8 +39,7 @@ function toggleAttribute(el, type, value) {
 }
 
 export function PseudoAttributesStateMachine(Base) {
-  if (Base !== NodeStateMachine && !(Base.prototype instanceof NodeStateMachine))
-    throw new Error("PseudoHostStateMachine only accepts a Base that is a NodeStateMachine.");
+  NodeStateMachine.protoInstanceOf(Base);
 
   return class PseudoHostStateMachine extends Base {
     #pseudoPrefix;

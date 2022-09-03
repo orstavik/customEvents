@@ -3,8 +3,7 @@ import {NodeStateMachine} from "./StateMachine.js";
 const resurrectedMetaElements = new WeakSet();
 
 export function PersistStateMachine(Base) {
-  if (Base !== NodeStateMachine && !(Base.prototype instanceof NodeStateMachine))
-    throw new Error("PersistStateMachine only accepts a Base that is a NodeStateMachine.");
+  NodeStateMachine.protoInstanceOf(Base);
 
   return class PersistentStateMachine extends Base {
     #meta;

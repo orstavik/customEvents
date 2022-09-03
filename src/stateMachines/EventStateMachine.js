@@ -19,9 +19,7 @@ import {NodeStateMachine} from "./StateMachine.js";
  */
 
 export function EventStateMachine(Base) {
-
-  if (Base !== NodeStateMachine && !(Base.prototype instanceof NodeStateMachine))
-    throw new Error("EventStateMachine only accepts a Base that is a NodeStateMachine.");
+  NodeStateMachine.protoInstanceOf(Base);
 
   return class EventStateMachine extends Base {
     #seenEvents = new WeakSet();
