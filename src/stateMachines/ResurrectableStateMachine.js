@@ -24,7 +24,7 @@ export function PersistStateMachine(Base) {
     constructor(owner) {
       super(owner);
       this.#verifyPersistability();
-      this.#meta = document.head.querySelector(`:scope > meta-${this.prefix}[uid=${(this.uid)}]`);
+      this.#meta = document.head.querySelector(`:scope > meta-${this.prefix}[uid=${this.uid}]`);
       if (this.#meta) {
         if (resurrectedMetaElements.has(this.#meta))
           throw "Recovering meta element with the same type and uid as another state machine. Rapport this bug and it will be fixed.";
