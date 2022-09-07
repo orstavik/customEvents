@@ -19,7 +19,8 @@ import {NodeStateMachine} from "./StateMachine.js";
  */
 
 export function EventStateMachine(Base) {
-  NodeStateMachine.protoInstanceOf(Base);
+  if (!NodeStateMachine.isPrototypeOf(Base))
+    throw new TypeError(`${Base.name} is not a subclass of NodeStateMachine.`);
 
   return class EventStateMachine extends Base {
     #seenEvents = new WeakSet();
@@ -27,8 +28,9 @@ export function EventStateMachine(Base) {
 
     constructor(owner) {
       super(owner);
-      if (!this.state)  //if no superclass has triggered enterState, then do so using the first state in the list.
-        this.enterState(Object.keys(this.#stateToListenerDict)[0]);
+      this.defaultState = Object.keys(this.#stateToListenerDict)[0];
+      if (this.state === undefined)  //if no superclass has triggered enterState, then do so using the first state in the list.
+        this.enterState(this.defaultState);
     }
 
     //This cannot be done in the constructor, but must be done on demand.
@@ -60,6 +62,10 @@ export function EventStateMachine(Base) {
       for (let [event, target, listener] of this.#stateToListenerDict[this.state])
         target.removeEventListener(event, listener);
       super.leaveState();
+    }
+
+    reset() {
+      this.enterState(this.defaultState, this.state);
     }
 
     destructor() {

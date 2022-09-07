@@ -2,10 +2,11 @@ import {NodeStateMachine} from "./StateMachine.js";
 import {MetaStateMachine} from "./MetaStateMachine.js";
 import {ReflectStateMachine} from "./PseudoHostStateMachine.js";
 import {EventStateMachine} from "./EventStateMachine.js";
+import {CaptureStateMachine} from "./CaptureStateMachine.js";
 
-const EventStateMachine_resurrectable_reflective = EventStateMachine(ReflectStateMachine(MetaStateMachine(NodeStateMachine)));
+const EventStateMachine_resurrectable_reflective = CaptureStateMachine(EventStateMachine(ReflectStateMachine(MetaStateMachine)));
 
-class SwipeEvent extends PointerEvent {
+export class SwipeEvent extends PointerEvent {
   #start;
   #end;
 
