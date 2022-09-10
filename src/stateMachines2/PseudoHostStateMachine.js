@@ -43,8 +43,8 @@ export function PseudoAttributesStateMachine(Base) {
   return class PseudoHostStateMachine extends Base {
 
     //todo this can be done in a define callback instead.
-    constructor(owner, meta) {
-      super(owner);
+    constructor(meta) {
+      super(meta);
       if (!this.constructor.pseudoAttributes)
         throw "Subclasses of PseudoHostStateMachine must implement 'static get pseudoAttributes(){return [...]}'.";
     }

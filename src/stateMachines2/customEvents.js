@@ -44,7 +44,7 @@ function monkeypatchCustomEventsAdd(OG) {
       let {instance, list} = customEventInstances.get(this, Definition) || {};
       if (!instance) {
         const meta = getOrMakeMeta(type, this);
-        instance = new Definition(this, meta), list = [];
+        instance = new Definition(meta), list = [];
         //todo merge the this/target into the meta as a property on the meta object, which will be the context.
         customEventInstances.set(this, Definition, {instance, list});
       }

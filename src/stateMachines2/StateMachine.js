@@ -7,14 +7,12 @@ function hostChain(el) {
 }
 
 export class NodeStateMachine {
-  #owner;
   #hosts;
   #stateValue;
   #state;
 
-  constructor(owner, meta) {
-    this.#owner = owner;
-    this.#hosts = hostChain(owner);
+  constructor(meta) {
+    this.#hosts = hostChain(meta.target);
     this.meta = meta;
     meta.reset = _=>this.reset();
   }
@@ -28,7 +26,7 @@ export class NodeStateMachine {
   }
 
   get owner() {
-    return this.#owner;
+    return this.meta.target;
   }
 
   get state() {
