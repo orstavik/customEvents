@@ -1,10 +1,10 @@
-import {MetaStateMachine} from "./MetaStateMachine.js";
 import {ReflectStateMachine} from "./PseudoHostStateMachine.js";
 import {EventStateMachine} from "./EventStateMachine.js";
 import {CaptureStateMachine} from "./CaptureStateMachine.js";
 import {MetaCaptureHTMLElement} from "./HTMLMetaElement_counter.js";
+import {NodeStateMachine} from "./StateMachine.js";
 
-const EventStateMachine_resurrectable_reflective = CaptureStateMachine(EventStateMachine(ReflectStateMachine(MetaStateMachine)));
+const EventStateMachine_resurrectable_reflective = CaptureStateMachine(EventStateMachine(ReflectStateMachine(NodeStateMachine)));
 
 export class SwipeEvent extends PointerEvent {
   #start;
@@ -78,8 +78,8 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
         Math.abs(now.x - start.x) > minDistance || Math.abs(now.y - start.y) > minDistance;
     }
 
-    constructor(owner) {
-      super(owner);
+    constructor(owner, meta) {
+      super(owner, meta);
       owner.style.setProperty("--userSelectDefault", owner.style.userSelect);
       owner.style.userSelect = "none";
     }

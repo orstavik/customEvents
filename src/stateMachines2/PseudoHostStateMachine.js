@@ -1,7 +1,7 @@
 import {NodeStateMachine} from "./StateMachine.js";
 
 export function ReflectStateMachine(Base) {
-  if (!NodeStateMachine.isPrototypeOf(Base))
+  if (!NodeStateMachine.isPrototypeOf(Base) && NodeStateMachine !== Base)
     throw new TypeError(`${Base.name} is not a subclass of NodeStateMachine.`);
 
   return class ReflectStateMachine extends Base {
@@ -43,7 +43,7 @@ export function PseudoAttributesStateMachine(Base) {
   return class PseudoHostStateMachine extends Base {
 
     //todo this can be done in a define callback instead.
-    constructor(owner, ) {
+    constructor(owner, meta) {
       super(owner);
       if (!this.constructor.pseudoAttributes)
         throw "Subclasses of PseudoHostStateMachine must implement 'static get pseudoAttributes(){return [...]}'.";

@@ -1,13 +1,13 @@
-import {MetaStateMachine} from "./MetaStateMachine.js";
 import {MetaCaptureHTMLElement} from "./HTMLMetaElement_counter.js";
+import {NodeStateMachine} from "./StateMachine.js";
 
 const captureKeyGenerator = MetaCaptureHTMLElement.singleton("capture");
 
-export function CaptureStateMachine(MetaStateMachineClass) {
-  if (!MetaStateMachine.isPrototypeOf(MetaStateMachineClass))
-    throw new TypeError(`${MetaStateMachineClass.name} is not a subclass of MetaStateMachine.`);
+export function CaptureStateMachine(NodeStateMachineClass) {
+  if (!NodeStateMachine.isPrototypeOf(NodeStateMachineClass) && NodeStateMachine !== NodeStateMachineClass)
+    throw new TypeError(`${NodeStateMachineClass.name} is not a subclass of MetaStateMachine.`);
 
-  return class CaptureStateMachine extends MetaStateMachineClass {
+  return class CaptureStateMachine extends NodeStateMachineClass {
     observe(event) {
       const metaId = captureKeyGenerator.getCaptureKey(event);
       this.meta.setAttribute("capture", (this.meta.getAttribute("capture")?? "") + (" " + metaId))

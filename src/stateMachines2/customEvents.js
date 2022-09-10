@@ -34,6 +34,8 @@ const customEventInstances = new OOWeakMap();
 //todo ABC. what i need is just the type+el => customEventInstance + [cb1, cb2, cb3]...
 // when there are no more listeners, then call destructor and remove.
 
+import {getOrMakeMeta} from "./HTMLMetaElement_target.js";
+
 function monkeypatchCustomEventsAdd(OG) {
   return function addEventListener_customEvents(type, cb, ...args) {
     const Definition = events[type];
@@ -41,7 +43,9 @@ function monkeypatchCustomEventsAdd(OG) {
       //only one customEventInstance with the same Definition is added to the same element.
       let {instance, list} = customEventInstances.get(this, Definition) || {};
       if (!instance) {
-        instance = new Definition(this, type), list = [];
+        const meta = getOrMakeMeta(type, this);
+        instance = new Definition(this, meta), list = [];
+        //todo merge the this/target into the meta as a property on the meta object, which will be the context.
         customEventInstances.set(this, Definition, {instance, list});
       }
       list.push({type, cb, args});
@@ -72,8 +76,8 @@ function monkeypatchCustomEventsRemove(OG) {
   }
 }
 
-import {monkeypatchFilteredEvents_add, monkeypatchFilteredEvents_remove} from "./filteredEvents.js";
-import {monkeyDefaultAction} from "./Event.defaultAction.js";
+import {monkeypatchFilteredEvents_add, monkeypatchFilteredEvents_remove} from "../filteredEvents.js";
+import {monkeyDefaultAction} from "../Event.defaultAction.js";
 //monkeypatch the add/removeEventListener
 (function (EventTargetOG, addEventListenerOG, removeEventListenerOG) {
   EventTargetOG.prototype.addEventListener = monkeypatchFilteredEvents_add(monkeypatchCustomEventsAdd(addEventListenerOG));
@@ -82,4 +86,4 @@ import {monkeyDefaultAction} from "./Event.defaultAction.js";
 
 monkeyDefaultAction(Event);
 
-import {} from "./EventLoop.js";
+// import {} from "../EventLoop.js";

@@ -26,8 +26,8 @@ export function EventStateMachine(Base) {
     #seenEvents = new WeakSet();
     #_stateToListenerDict;
 
-    constructor(owner) {
-      super(owner);
+    constructor(owner, meta) {
+      super(owner, meta);
       this.defaultState = Object.keys(this.#stateToListenerDict)[0];
       if (this.state === undefined)  //if no superclass has triggered enterState, then do so using the first state in the list.
         this.enterState(this.defaultState);

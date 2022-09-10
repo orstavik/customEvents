@@ -1,37 +1,35 @@
 const locked = new WeakMap();
 
-export class StateHTMLMetaElement extends HTMLElement {
-
-  get state() {
-    const state = this.getAttribute("state");
-    let stateValue = this.hasAttribute("statevalue") ? JSON.parse(this.getAttribute("statevalue")) : undefined;
-    return {state, stateValue};
+export function getOrMakeMeta(attr, target) {
+  const lock = target;
+  const id = shadowDomQuerySelector(target);
+  let meta = document.head.querySelector(`:scope > meta[${attr}=${id}]`);
+  if (locked.has(meta) && lock !== locked.get(meta))
+    throw new Error("Two state machines try to connect to the same <meta> element.");
+  if (!meta) {
+    meta = document.createElement(`meta`);
+    meta.setAttribute(attr, id);
+    document.head.append(meta);
   }
+  locked.set(meta, lock);
+  return meta;
+}
 
-  set state({state, stateValue}) {
-    this.#toggleAttribute("state", state);
-    this.#toggleAttribute("statevalue", statevalue);
-  }
+//todo this might not be persistable if a shadowDom gives IDs dynamically during construction.
+// This will only work if IDs are assigned to elements in shadowDOM so that the same elements
+// get the same ID whenever it is reconstructed.
+function shadowDomQuerySelector(el) {
+  if (!el.isConnected)
+    throw new Error("PersistentEventStateMachines can only be added to elements already connected to the DOM.");
+  const ids = hostChain(el).map(el => el.id);
+  if (!ids.every(id => id))
+    throw `A uid cannot be created for the given state machine: ${el.tagName}`;
+    return ids.join(" >> ");
+}
 
-  #toggleAttribute(key, value) {
-    value && key ? this.setAttribute(key, JSON.stringify(value)) : this.removeAttribute(key);
-  }
-
-  static upgrade(metaEl) {
-    Object.setPrototypeOf(metaEl, this.prototype);
-  }
-
-  static singleton(type, value, key) {
-    let metaEl = document.head.querySelector(`:scope > meta[${type}=${value}]`);
-    if (key !== locked.get(metaEl))
-      throw new Error("Wrong key for <meta> element.");
-    if (!metaEl) {
-      metaEl = document.createElement(`meta`);
-      metaEl.setAttribute(type, value);
-      document.head.append(metaEl);
-    }
-    locked.set(metaEl, key);
-    this.upgrade(metaEl);
-    return metaEl;
-  }
+export function hostChain(el) {
+  const res = [];
+  for (; el; el = el.getRootNode()?.host)
+    res.unshift(el);
+  return res;
 }
