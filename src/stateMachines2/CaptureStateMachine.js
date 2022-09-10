@@ -16,7 +16,7 @@ export function CaptureStateMachine(NodeStateMachineClass) {
     capture() {
       for (let key of this.meta.getAttribute("capture").split(" "))
         for (let metaMachine of document.head.querySelectorAll(`:scope > meta[capture~="${key}"]`))
-          metaMachine !== this.meta && metaMachine.machine.reset();
+          metaMachine !== this.meta && metaMachine.reset();
     }
   }
 }

@@ -16,8 +16,7 @@ export class NodeStateMachine {
     this.#owner = owner;
     this.#hosts = hostChain(owner);
     this.meta = meta;
-    this.meta.machine = this;              //todo remove this
-    // meta.reset = _=>this.reset(); //todo       add this
+    meta.reset = _=>this.reset();
   }
 
   get prefix() {

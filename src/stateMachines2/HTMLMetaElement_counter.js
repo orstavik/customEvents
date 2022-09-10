@@ -11,7 +11,7 @@ export class MetaCaptureHTMLElement extends HTMLMetaElement {
 
   resetCaptureKey(key){
     for (let metaMachine of document.head.querySelectorAll(`:scope > meta[capture~="${key}"]`))
-      metaMachine !== this && metaMachine.machine.reset();
+      metaMachine !== this && metaMachine.reset();
   }
 
   getCount() {
