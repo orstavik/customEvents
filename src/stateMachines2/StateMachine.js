@@ -1,20 +1,10 @@
-//todo this is an HTMLElement method.
-function hostChain(el) {
-  const res = [];
-  for (; el; el = el.getRootNode()?.host)
-    res.unshift(el);
-  return res;
-}
-
 export class NodeStateMachine {
-  #hosts;
   #stateValue;
   #state;
 
   constructor(meta) {
-    this.#hosts = hostChain(meta.target);
     this.meta = meta;
-    meta.reset = _=>this.reset();
+    meta.reset = _=>this.reset(); //todo can be done in the event listener??
   }
 
   get prefix() {
@@ -22,7 +12,7 @@ export class NodeStateMachine {
   }
 
   get hosts() {
-    return this.#hosts;
+    return this.meta.targets;
   }
 
   get owner() {
