@@ -1,18 +1,29 @@
-const locked = new WeakMap();
-
 export function getOrMakeMeta(attr, target) {
-  const lock = target;
   const id = shadowDomQuerySelector(target);
   let meta = document.head.querySelector(`:scope > meta[${attr}=${id}]`);
-  if (locked.has(meta) && lock !== locked.get(meta))
-    throw new Error("Two state machines try to connect to the same <meta> element.");
-  if (!meta) {
+  if (!meta) {        //no meta, making a new one
     meta = document.createElement(`meta`);
     meta.setAttribute(attr, id);
+    Object.defineProperty(meta, "target", {
+      configurable: false, get: function () {
+        return target
+      }
+    });
     document.head.append(meta);
+    return meta;
   }
-  locked.set(meta, lock);
-  return meta;
+  if (meta.target === target)    //todo this is likely a bug.
+    return meta;
+  if (meta.target === undefined) {  //resurrection meta
+    Object.defineProperty(meta, "target", {
+      configurable: false, get: function () {
+        return target
+      }
+    });
+    return meta;
+  }
+  // if (meta.target !== target)
+  throw new Error("Two state machines try to connect to the same <meta> element.");
 }
 
 //todo this might not be persistable if a shadowDom gives IDs dynamically during construction.
@@ -24,7 +35,7 @@ function shadowDomQuerySelector(el) {
   const ids = hostChain(el).map(el => el.id);
   if (!ids.every(id => id))
     throw `A uid cannot be created for the given state machine: ${el.tagName}`;
-    return ids.join(" >> ");
+  return ids.join(" >> ");
 }
 
 export function hostChain(el) {
