@@ -41,12 +41,12 @@ function monkeypatchCustomEventsAdd(OG) {
     const Definition = events[type];
     if (Definition) {
       //only one customEventInstance with the same Definition is added to the same element.
-      let {instance, list} = customEventInstances.get(this, Definition) || {};
+      let {instance, list, meta} = customEventInstances.get(this, Definition) || {};
       if (!instance) {
-        const meta = getOrMakeMeta(type, this);
+        meta = getOrMakeMeta(type, this);
         instance = new Definition(meta), list = [];
         //todo merge the this/target into the meta as a property on the meta object, which will be the context.
-        customEventInstances.set(this, Definition, {instance, list});
+        customEventInstances.set(this, Definition, {instance, list, meta});
       }
       list.push({type, cb, args});
     }
@@ -58,7 +58,7 @@ function monkeypatchCustomEventsRemove(OG) {
   return function removeEventListener_customEvents(type, cb, ...args) {
     const Definition = events[type];
     if (Definition) {
-      let {instance, list} = customEventInstances.get(this, Definition); //only one customEventInstance with the same Definition is added to the same element.
+      let {instance, list, meta} = customEventInstances.get(this, Definition); //one customEventInstance per target element
       for (let i = 0; i < list.length; i++) {
         let {type: type2, cb: cb2, args} = list[i];
         if (type2 === type && cb2 === cb) {
@@ -68,6 +68,7 @@ function monkeypatchCustomEventsRemove(OG) {
       }
       if (list.length === 0) {
         instance.destructor();
+        meta.remove();
         customEventInstances.remove(this, Definition);
       }
     }
@@ -85,5 +86,3 @@ import {monkeyDefaultAction} from "../Event.defaultAction.js";
 })(EventTarget, addEventListener, removeEventListener);
 
 monkeyDefaultAction(Event);
-
-// import {} from "../EventLoop.js";

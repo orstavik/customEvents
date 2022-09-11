@@ -48,7 +48,6 @@ export class NodeStateMachine {
   destructor() {
     this.#state = undefined;
     this.#stateValue = undefined;
-    this.meta.remove();
     //remember that super.destructor() calls should run in the reverse sequence of constructor calls.
     //ie.: build up processes (such as constructor and enterState) should run inside out (superclass before subclass)
     //     tear down processes (such as destructor and leaveState) should run outside in (subclass before superclass)
