@@ -1,3 +1,5 @@
+const cachedStates = new WeakMap();
+
 function upgradeMeta(meta, target, targets) {
   Object.defineProperties(meta, {
     "target": {
@@ -25,8 +27,13 @@ function upgradeMeta(meta, target, targets) {
     },
     "value": {
       configurable: false, get() {
-        return this.hasAttribute("statevalue") ? JSON.parse(this.getAttribute("statevalue")) : undefined;
+        if (cachedStates.has(this))
+          return cachedStates.get(this);
+        const savedState = this.hasAttribute("statevalue") ? JSON.parse(this.getAttribute("statevalue")) : undefined;
+        cachedStates.set(this, savedState);
+        return savedState;
       }, set(value) {
+        cachedStates.set(this, value);
         value === undefined ? this.removeAttribute("statevalue") : this.setAttribute("statevalue", JSON.stringify(value));
       }
     }

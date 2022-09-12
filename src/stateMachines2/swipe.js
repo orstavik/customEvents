@@ -95,15 +95,9 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     }
 
     static startObserving(e, instance) {
-      //todo here we need to add the e.target to the state. And this needs to be done in a freeze state
-      //todo here we need to do a relatedTarget
-      //todo we have listener target, and then we have multiple other targets, and we need to preserve those targets.
-      return {x: e.x, y: e.y, timeStamp: e.timeStamp};
+      return {x: e.x, y: e.y, timeStamp: e.timeStamp, target: e.target, id: e.target.id};
     }
 
-    //2. Save different targets in the meta element.
-    //   Here we need the >>> deep querySelector and we need to check that the elements can be ressurected.
-    //   This is the classic problem.
     static reset(e, instance) {
     }
 
@@ -118,11 +112,14 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     }
 
     static complete(end, {meta: {target, value: start}}) {
-      //todo here we would like the swipe event to be dispatched from the start.target.
-      // this means that we need to preserve the event element as an object in the state,
-      // and as a reference to an <event-> element in the <event-loop> in the meta-swipe element.
-      // this will also cause the reconstruction to create an Event object that can be called preventDefault() on
-      // and that will
+      //todo how to make the best structure for freezing and resurrecting event objects in and out of JSON
+      if(start.target instanceof Event){
+        target = start.target;
+      } else if(target.id !== start.id) {
+        let idTarget = target.querySelector("#"+start.id);
+        if(idTarget)
+          target = idTarget;
+      }
       end.defaultAction = _ => target.dispatchEvent(new SwipeEvent(this.prefix, {start, end}));
     }
 
