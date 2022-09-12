@@ -65,11 +65,11 @@ export function EventStateMachine(Base) {
       super.destructor();
     }
 
-    #makeListener(nextState, action) {
+    #makeListener(nextState, transition) {
       return e => {
         if (this.#seenEvents.has(e))
           return;
-        const nextStateValue = action.call(this, e, this.owner, this.stateValue, this.meta); //this
+        const nextStateValue = transition.call(this.constructor, e, this);// this.owner, this.stateValue, this.meta); //this
         if (nextStateValue === false)   //todo make the next state value from false to undefined, or throw??
           return;
         this.#seenEvents.add(e);
@@ -85,8 +85,12 @@ export function EventStateMachine(Base) {
         this.meta.removeAttribute("capture");
       else if (captureType === "capture") {
         const queryAllMatching = this.meta.getAttribute("capture").split(" ").map(key => `:scope > meta[capture~="${key}"]`).join(", ");
-        for (let meta of document.head.querySelectorAll(queryAllMatching))
-          meta !== this.meta && meta.reset();
+        for (let meta of document.head.querySelectorAll(queryAllMatching)) {
+          if (meta !== this.meta) {
+            meta.reset();
+            meta.removeAttribute("capture");
+          }
+        }
       } else if (captureType === "observe") {
         const metaId = captureCounter.getCaptureKey(e);
         const val = this.meta.getAttribute("capture");

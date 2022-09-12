@@ -58,7 +58,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
           ["active", Swipe.activate, "pointermove_1", window],
         ],
         active: [
-          ["start", Swipe.reset, "pointermove_prevented", window],
+          ["start", Swipe.cancel, "pointermove_prevented", window],
           ["start", Swipe.cancel, "pointermove_outofbounds", window],
           // ["start", Swipe.cancel, "pointerup", window],   //todo we probably need a filter on this pointerup event.
           ["start", Swipe.cancel, "blur", window],
@@ -94,7 +94,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
       this.owner.style.userSelect = "none";
     }
 
-    static startObserving(e, owner, state, meta) {
+    static startObserving(e, instance) {
       //todo here we need to add the e.target to the state. And this needs to be done in a freeze state
       //todo here we need to do a relatedTarget
       //todo we have listener target, and then we have multiple other targets, and we need to preserve those targets.
@@ -104,26 +104,26 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     //2. Save different targets in the meta element.
     //   Here we need the >>> deep querySelector and we need to check that the elements can be ressurected.
     //   This is the classic problem.
-    static reset(e, owner, state, meta) {
+    static reset(e, instance) {
     }
 
-    static activate(e, owner, state, meta) {
-      if (!Swipe.longEnough(state, e))
+    static activate(e, instance) {
+      if (!Swipe.longEnough(instance.meta.value, e))
         return false;
-      return state;
+      return instance.meta.value;
     }
 
-    static cancel(e, owner, state, meta) {
-      nextTick(_ => meta.target.dispatchEvent(new SwipeEvent(this.prefix + "cancel", {reason: e.type})));
+    static cancel(e, instance) {
+      nextTick(_ => instance.meta.target.dispatchEvent(new SwipeEvent(this.prefix + "cancel", {reason: e.type})));
     }
 
-    static complete(end, owner, start, meta) {
+    static complete(end, {meta: {target, value: start}}) {
       //todo here we would like the swipe event to be dispatched from the start.target.
       // this means that we need to preserve the event element as an object in the state,
       // and as a reference to an <event-> element in the <event-loop> in the meta-swipe element.
       // this will also cause the reconstruction to create an Event object that can be called preventDefault() on
       // and that will
-      end.defaultAction = _ => meta.target.dispatchEvent(new SwipeEvent(this.prefix, {start, end}));
+      end.defaultAction = _ => target.dispatchEvent(new SwipeEvent(this.prefix, {start, end}));
     }
 
     destructor() {

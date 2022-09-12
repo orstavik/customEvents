@@ -38,7 +38,7 @@ import {getOrMakeMeta} from "./HTMLMetaElement_target.js";
 
 function monkeypatchCustomEventsAdd(OG) {
   return function addEventListener_customEvents(type, cb, ...args) {
-    const Definition = events[type];
+    const Definition = events[type];                   //todo look for prefix, not for exact match.
     if (Definition) {
       //only one customEventInstance with the same Definition is added to the same element.
       let {instance, list, meta} = customEventInstances.get(this, Definition) || {};

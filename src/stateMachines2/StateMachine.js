@@ -8,15 +8,10 @@ export class NodeStateMachine {
     this.#meta = meta;
     Object.defineProperty(meta, "reset", {
       value: function () {
-        this.removeAttribute("capture");
         const {state, value} = this.constructor.defaultState();
         return this.enterState(state, value);
       }.bind(this)
     });
-  }
-
-  get prefix() {
-    return this.constructor.prefix;
   }
 
   get meta() {
