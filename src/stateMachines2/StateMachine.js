@@ -1,3 +1,6 @@
+//remember that super.destructor() calls should run in the reverse sequence of constructor calls.
+//ie.: build up processes (such as constructor and enterState) runs inside out (superclass before subclass)
+//     tear down processes (such as destructor and leaveState) runs outside in (subclass before superclass)
 export class NodeStateMachine {
   #meta;
 
@@ -5,7 +8,8 @@ export class NodeStateMachine {
     this.#meta = meta;
     Object.defineProperty(meta, "reset", {
       value: function () {
-        return this;
+        const {state, value} = this.constructor.defaultState();
+        return this.enterState(state, value);
       }.bind(this)
     });
   }
@@ -35,19 +39,15 @@ export class NodeStateMachine {
   }
 
   enterState(state, value) {
-    this.#meta.setState(state, value);
+    if (state === undefined)
+      throw new Error("A statemachine cannot enter an undefined state");
+    this.#meta.state = state;
+    this.#meta.value = value;
   }
 
   leaveState() {
   }
 
-  reset() {
-    //todo
-  }
-
   destructor() {
-    //remember that super.destructor() calls should run in the reverse sequence of constructor calls.
-    //ie.: build up processes (such as constructor and enterState) should run inside out (superclass before subclass)
-    //     tear down processes (such as destructor and leaveState) should run outside in (subclass before superclass)
   }
 }

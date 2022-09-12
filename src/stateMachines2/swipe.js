@@ -70,7 +70,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
       };
     }
 
-    static getState() {
+    static defaultState() {
       return {state: "start", value: undefined};
     }
 

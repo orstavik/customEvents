@@ -22,33 +22,29 @@ function upgradeMeta(meta, target, targets) {
     },
     "capture": {
       value: function capture() {
-        for (let key of this.getAttribute("capture").split(" "))
-          for (let metaMachine of document.head.querySelectorAll(`:scope > meta[capture~="${key}"]`))
-            metaMachine !== this.meta && metaMachine.reset();
-      }
-    },
-    "setState": {
-      value: function setState(state, value) {
-        this.setAttribute("state", state);
-        value === undefined ?
-          this.removeAttribute("statevalue") :
-          this.setAttribute("statevalue", JSON.stringify(value));
+        const queryAllMatching = this.getAttribute("capture").split(" ").map(key => `:scope > meta[capture~="${key}"]`).join(", ");
+        for (let metaMachine of document.head.querySelectorAll(queryAllMatching))
+          metaMachine !== this && metaMachine.reset();
       }
     },
     "getState": {
       value: function getState() {
-        if (this.hasAttribute("state"))
-          return {state: this.getAttribute("state"), value: this.getAttribute("statevalue")};
+        if (this.state)
+          return {state: this.state, value: this.value};
       }
     },
     "state": {
       configurable: false, get() {
-        return this.getAttribute("state");
+        return this.hasAttribute("state") ? this.getAttribute("state") : undefined;
+      }, set(state) {
+        state === undefined ? this.removeAttribute("state") : this.setAttribute("state", state);
       }
     },
     "value": {
       configurable: false, get() {
-        return JSON.parse(this.getAttribute("statevalue"));
+        return this.hasAttribute("statevalue") ? JSON.parse(this.getAttribute("statevalue")) : undefined;
+      }, set(value) {
+        value === undefined ? this.removeAttribute("statevalue") : this.setAttribute("statevalue", JSON.stringify(value));
       }
     }
   });
