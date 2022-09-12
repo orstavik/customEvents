@@ -45,6 +45,11 @@ function upgradeMeta(meta, target, targets) {
       configurable: false, get() {
         return this.getAttribute("state");
       }
+    },
+    "value": {
+      configurable: false, get() {
+        return JSON.parse(this.getAttribute("statevalue"));
+      }
     }
   });
   return meta;

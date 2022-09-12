@@ -1,6 +1,4 @@
 export class NodeStateMachine {
-  #stateValue;
-  #state;
   #meta;
 
   constructor(meta) {
@@ -29,22 +27,18 @@ export class NodeStateMachine {
   }
 
   get state() {
-    return this.#state;
+    return this.#meta.state;
   }
 
   get stateValue() {
-    return this.#stateValue;
+    return this.#meta.value;
   }
 
   enterState(state, value) {
-    this.#state = state;
-    this.#stateValue = value;
     this.#meta.setState(state, value);
   }
 
   leaveState() {
-    this.#state = undefined;
-    this.#stateValue = undefined;
   }
 
   reset() {
@@ -52,8 +46,6 @@ export class NodeStateMachine {
   }
 
   destructor() {
-    this.#state = undefined;
-    this.#stateValue = undefined;
     //remember that super.destructor() calls should run in the reverse sequence of constructor calls.
     //ie.: build up processes (such as constructor and enterState) should run inside out (superclass before subclass)
     //     tear down processes (such as destructor and leaveState) should run outside in (subclass before superclass)
