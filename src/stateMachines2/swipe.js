@@ -50,24 +50,32 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
           ["start", Swipe.reset, "pointermove_prevented", window],          //this check should be done after the propagation has finished too..
           ["start", Swipe.reset, "pointermove_outofbounds", window],        //this event controller needs to react to the preventDefault on the pointer move,
                                                                             //also when this is called later in the propagation hierarchy.
-          ["active", Swipe.activate, "pointermove_1", window],
-
           ["start", Swipe.reset, "pointerup", window],
           ["start", Swipe.reset, "blur", window],
           ["start", Swipe.reset, "selectstart", window],
           ["start", Swipe.reset, "pointerdown", window],
+
+          ["active", Swipe.activate, "pointermove_1", window],
         ],
         active: [
-          ["start", Swipe.complete, "pointerup", window],
-
-          ["start", Swipe.cancel, "pointermove_prevented", window],
+          ["start", Swipe.reset, "pointermove_prevented", window],
           ["start", Swipe.cancel, "pointermove_outofbounds", window],
-          ["start", Swipe.cancel, "pointerup", window],
+          // ["start", Swipe.cancel, "pointerup", window],   //todo we probably need a filter on this pointerup event.
           ["start", Swipe.cancel, "blur", window],
           ["start", Swipe.cancel, "selectstart", window],
           ["start", Swipe.cancel, "pointerdown", window],
+
+          ["start", Swipe.complete, "pointerup", window],
         ]
       };
+    }
+
+    static get capturePhases(){
+      return {
+        start: "reset",
+        observe: "observe",
+        active: "capture"
+      }
     }
 
     static defaultState() {
@@ -81,26 +89,27 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
 
     constructor(meta) {
       super(meta);
+      //todo use the meta instead of the owner to cache the default userSelect state
       this.owner.style.setProperty("--userSelectDefault", this.owner.style.userSelect);
       this.owner.style.userSelect = "none";
     }
 
     static startObserving(e, owner, state, meta) {
-      meta.observe(e);
       //todo here we need to add the e.target to the state. And this needs to be done in a freeze state
       //todo here we need to do a relatedTarget
       //todo we have listener target, and then we have multiple other targets, and we need to preserve those targets.
       return {x: e.x, y: e.y, timeStamp: e.timeStamp};
     }
 
+    //2. Save different targets in the meta element.
+    //   Here we need the >>> deep querySelector and we need to check that the elements can be ressurected.
+    //   This is the classic problem.
     static reset(e, owner, state, meta) {
-      meta.removeAttribute("capture");
     }
 
     static activate(e, owner, state, meta) {
       if (!Swipe.longEnough(state, e))
         return false;
-      meta.capture();
       return state;
     }
 

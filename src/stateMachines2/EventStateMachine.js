@@ -66,13 +66,25 @@ export function EventStateMachine(Base) {
       return e => {
         if (this.#seenEvents.has(e))
           return;
-        const nextStateValue = action.call(this, e, this.owner, this.stateValue, this.meta);
+        const nextStateValue = action.call(this, e, this.owner, this.stateValue, this.meta); //this
         if (nextStateValue === false)   //todo make the next state value from false to undefined, or throw??
           return;
         this.#seenEvents.add(e);
         this.leaveState();
+        this.#captureTransition(nextState, e);
         this.enterState(nextState, nextStateValue);
       }
+    }
+
+    #captureTransition(nextState, e) {
+      const captureType = this.constructor.capturePhases?.[nextState];
+      if (captureType === "reset")
+        this.meta.removeAttribute("capture");
+      else if (captureType === "capture")
+        this.meta.capture();
+      else if (captureType === "observe")
+        this.meta.observe(e);
+      //else no capturing is done for this state change.
     }
   }
 }
