@@ -20,36 +20,3 @@ export function CaptureStateMachine(NodeStateMachineClass) {
     }
   }
 }
-//
-// //todo the below code is for transient usages, not good architecture, feels bad sometimes, don't remember why.
-// const keysToStateMachines = new WeakMap();
-// const stateMachineToKeys = new WeakMap();
-//
-// function* machineToCapturedMachines(m) {
-//   for (let key of stateMachineToKeys.get(m))
-//     for (let machine of keysToStateMachines.get(key))
-//       if (machine !== m)
-//         yield machine;
-// }
-//
-// function addKeyForMachine(machine, event) {
-//   const keys = stateMachineToKeys.get(machine);
-//   keys ? keys.push(event) : stateMachineToKeys.set(machine, [event]);
-//   const machines = keysToStateMachines.get(event);
-//   machines ? machines.push(machine) : keysToStateMachines.set(event, [machine]);
-// }
-//
-// export function CaptureJS(NodeStateMachineClass) {
-//   if (!NodeStateMachine.isPrototypeOf(NodeStateMachineClass))
-//     throw new TypeError(`${NodeStateMachineClass.name} is not a subclass of MetaStateMachine.`);
-//   return class CaptureStateMachine extends NodeStateMachine {
-//     observe(event) {
-//       addKeyForMachine(this, event);
-//     }
-//
-//     capture() {
-//       for (let other of machineToCapturedMachines(this))
-//         other.reset();
-//     }
-//   };
-// }
