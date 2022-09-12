@@ -1,33 +1,17 @@
-export class MetaCaptureHTMLElement extends HTMLMetaElement {
+export class CaptureCounter {
+  #count;
+  #objToNumber = new WeakMap();
+
+  constructor(type) {
+    this.#count = 0;
+    for (let el of document.head.querySelectorAll(`:scope > meta[${type}]`))
+      this.#count = Math.max(this.#count, ...[...el.getAttribute(type)].split(" ").map(c => parseInt(c)));
+  }
 
   getCaptureKey(obj) {
-    const oldId = this._objToNumber.get(obj);
-    if (oldId)
-      return oldId;
-    const key = parseInt(this.getAttribute("count")) + 1; //todo is there an operator that ensures positive integers here?
-    this.setAttribute("count", key);                      //todo what if we surpass max integer??
-    this._objToNumber.set(obj, key);
-    return key;
-  }
-
-  static upgrade(metaEl) {
-    Object.setPrototypeOf(metaEl, this.prototype);
-    metaEl._objToNumber = new WeakMap();
-  }
-
-  /**
-   * Gets a <meta type> element from the <head>.
-   * If no <meta type> element is found, adds a <meta type=defaultValue> to the element.
-   */
-  static singleton(type, defaultValue = "0") {
-    let metaEl = document.head.querySelector(`:scope > meta[${type}]`);
-    if (!metaEl) {
-      metaEl = document.createElement("meta");
-      document.head.append(metaEl);
-      metaEl.setAttribute("type", type);
-      metaEl.setAttribute("count", defaultValue);
-    }
-    this.upgrade(metaEl);
-    return metaEl;
+    let num = this.#objToNumber.get(obj);
+    if (!num)
+      this.#objToNumber.set(obj, num = ++this.#count);
+    return num;
   }
 }

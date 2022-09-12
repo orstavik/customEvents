@@ -1,7 +1,3 @@
-import {MetaCaptureHTMLElement} from "./HTMLMetaElement_counter.js";
-
-const capture = MetaCaptureHTMLElement.singleton("capture");
-
 function upgradeMeta(meta, target, targets) {
   Object.defineProperties(meta, {
     "target": {
@@ -12,21 +8,6 @@ function upgradeMeta(meta, target, targets) {
     "targets": {
       configurable: false, get() {
         return targets;
-      }
-    },
-    "observe": {
-      value: function observe(event) {
-        const metaId = capture.getCaptureKey(event);
-        const val = this.getAttribute("capture");
-        this.setAttribute("capture", val ? val + " " + metaId : metaId);
-      }
-    },
-    "capture": {
-      value: function capture() {
-        const queryAllMatching = this.getAttribute("capture").split(" ").map(key => `:scope > meta[capture~="${key}"]`).join(", ");
-        for (let meta of document.head.querySelectorAll(queryAllMatching))
-          meta !== this && meta.reset();
-        this.removeAttribute("capture");
       }
     },
     "getState": {

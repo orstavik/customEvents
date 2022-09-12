@@ -1,4 +1,7 @@
 import {NodeStateMachine} from "./StateMachine.js";
+import {CaptureCounter} from "./HTMLMetaElement_counter.js";
+
+const captureCounter = new CaptureCounter("capture");
 
 /*
  * Rules for EventStateMachine:
@@ -80,10 +83,15 @@ export function EventStateMachine(Base) {
       const captureType = this.constructor.capturePhases?.[nextState];
       if (captureType === "reset")
         this.meta.removeAttribute("capture");
-      else if (captureType === "capture")
-        this.meta.capture();
-      else if (captureType === "observe")
-        this.meta.observe(e);
+      else if (captureType === "capture") {
+        const queryAllMatching = this.meta.getAttribute("capture").split(" ").map(key => `:scope > meta[capture~="${key}"]`).join(", ");
+        for (let meta of document.head.querySelectorAll(queryAllMatching))
+          meta !== this.meta && meta.reset();
+      } else if (captureType === "observe") {
+        const metaId = captureCounter.getCaptureKey(e);
+        const val = this.meta.getAttribute("capture");
+        this.meta.setAttribute("capture", val ? val + " " + metaId : metaId);
+      }
       //else no capturing is done for this state change.
     }
   }
