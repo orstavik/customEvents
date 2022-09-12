@@ -1,22 +1,27 @@
 export class NodeStateMachine {
   #stateValue;
   #state;
+  #meta;
 
   constructor(meta) {
-    this.meta = meta;
-    meta.reset = _=>this.reset(); //todo can be done in the event listener??
+    this.#meta = meta;
+    meta.reset = _ => this.reset(); //todo can be done in the event listener??
   }
 
   get prefix() {
     return this.constructor.prefix;
   }
 
+  get meta(){
+    return this.#meta;
+  }
+
   get hosts() {
-    return this.meta.targets;
+    return this.#meta.targets;
   }
 
   get owner() {
-    return this.meta.target;
+    return this.#meta.target;
   }
 
   get state() {
@@ -30,10 +35,10 @@ export class NodeStateMachine {
   enterState(state, value) {
     this.#state = state;
     this.#stateValue = value;
-    this.meta.setAttribute("state", state);
+    this.#meta.setAttribute("state", state);
     value === undefined ?
-      this.meta.removeAttribute("statevalue") :
-      this.meta.setAttribute("statevalue", JSON.stringify(value));
+      this.#meta.removeAttribute("statevalue") :
+      this.#meta.setAttribute("statevalue", JSON.stringify(value));
   }
 
   leaveState() {
@@ -41,7 +46,7 @@ export class NodeStateMachine {
     this.#stateValue = undefined;
   }
 
-  reset(){
+  reset() {
     //todo
   }
 
