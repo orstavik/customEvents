@@ -6,18 +6,19 @@ function upgradeMeta(meta, target, targets) {
   Object.defineProperties(meta, {
     "target": {
       configurable: false, get() {
-        return target
+        return target;
       }
     },
     "targets": {
       configurable: false, get() {
-        return targets
+        return targets;
       }
     },
     "observe": {
       value: function observe(event) {
         const metaId = capture.getCaptureKey(event);
-        this.setAttribute("capture", (this.getAttribute("capture") ?? "") + (" " + metaId))
+        const val = this.getAttribute("capture");
+        this.setAttribute("capture", val ? val + " " + metaId : metaId);
       }
     },
     "capture": {

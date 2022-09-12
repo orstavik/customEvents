@@ -62,10 +62,6 @@ export function EventStateMachine(Base) {
       super.leaveState();
     }
 
-    // reset() {
-    //   this.enterState(this.defaultState, this.state);
-    // }
-
     destructor() {
       //super.destructor() voids this.state, therefore subclass.destructor() before superclass.destructor()
       for (let [event, target, listener] of this.#stateToListenerDict[this.state])

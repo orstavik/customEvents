@@ -10,11 +10,6 @@ export class MetaCaptureHTMLElement extends HTMLMetaElement {
     return key;
   }
 
-  resetCaptureKey(key){
-    for (let metaMachine of document.head.querySelectorAll(`:scope > meta[capture~="${key}"]`))
-      metaMachine !== this && metaMachine.reset();
-  }
-
   static upgrade(metaEl) {
     Object.setPrototypeOf(metaEl, this.prototype);
     metaEl._objToNumber = new WeakMap();
