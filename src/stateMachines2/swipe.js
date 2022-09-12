@@ -1,10 +1,8 @@
 import {ReflectStateMachine} from "./PseudoHostStateMachine.js";
 import {EventStateMachine} from "./EventStateMachine.js";
-import {CaptureStateMachine} from "./CaptureStateMachine.js";
-import {MetaCaptureHTMLElement} from "./HTMLMetaElement_counter.js";
 import {NodeStateMachine} from "./StateMachine.js";
 
-const EventStateMachine_resurrectable_reflective = CaptureStateMachine(EventStateMachine(ReflectStateMachine(NodeStateMachine)));
+const EventStateMachine_resurrectable_reflective = EventStateMachine(ReflectStateMachine(NodeStateMachine));
 
 export class SwipeEvent extends PointerEvent {
   #start;
@@ -40,7 +38,6 @@ export class SwipeEvent extends PointerEvent {
 }
 
 //todo direction is for horizontal-only / vertical-only
-const metaCapture = MetaCaptureHTMLElement.singleton("capture");
 
 export function createSwipe({minDuration = 350, minDistance = 50, direction} = {}) {
   return class Swipe extends EventStateMachine_resurrectable_reflective {
@@ -73,6 +70,10 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
       };
     }
 
+    static getState() {
+      return {state: "start", value: undefined};
+    }
+
     static longEnough(start, now) {
       return ((now.timeStamp - start.timeStamp) > minDuration) &&
         Math.abs(now.x - start.x) > minDistance || Math.abs(now.y - start.y) > minDistance;
@@ -85,8 +86,9 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     }
 
     static startObserving(e, owner, state) {
-      const observingKey = metaCapture.getCaptureKey(e);
-      this.meta.setAttribute("capture", observingKey);
+      this.meta.observe(e);
+      // const observingKey = metaCapture.getCaptureKey(e);
+      // this.meta.setAttribute("capture", observingKey);
       return {x: e.x, y: e.y, timeStamp: e.timeStamp};
     }
 
@@ -95,6 +97,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     }
 
     static activate(e, owner, state) {
+      this.meta.capture();
       if (!Swipe.longEnough(state, e))
         return false;
       return state;

@@ -4,7 +4,8 @@ export class MetaCaptureHTMLElement extends HTMLMetaElement {
     const oldId = this._objToNumber.get(obj);
     if (oldId)
       return oldId;
-    const key = this.getCount();
+    const key = parseInt(this.getAttribute("count")) + 1; //todo is there an operator that ensures positive integers here?
+    this.setAttribute("count", key);                      //todo what if we surpass max integer??
     this._objToNumber.set(obj, key);
     return key;
   }
@@ -12,12 +13,6 @@ export class MetaCaptureHTMLElement extends HTMLMetaElement {
   resetCaptureKey(key){
     for (let metaMachine of document.head.querySelectorAll(`:scope > meta[capture~="${key}"]`))
       metaMachine !== this && metaMachine.reset();
-  }
-
-  getCount() {
-    const key = parseInt(this.getAttribute("capture")) + 1; //todo is there an operator that ensures positive integers here?
-    this.setAttribute("capture", key);                      //todo what if we surpass max integer??
-    return key;
   }
 
   static upgrade(metaEl) {
@@ -34,7 +29,8 @@ export class MetaCaptureHTMLElement extends HTMLMetaElement {
     if (!metaEl) {
       metaEl = document.createElement("meta");
       document.head.append(metaEl);
-      metaEl.setAttribute(type, defaultValue);
+      metaEl.setAttribute("type", type);
+      metaEl.setAttribute("count", defaultValue);
     }
     this.upgrade(metaEl);
     return metaEl;

@@ -36,8 +36,6 @@ const customEventInstances = new OOWeakMap();
 
 import {getOrMakeMeta} from "./HTMLMetaElement_target.js";
 
-// let captureLock = getOrMakeCaptureLock(); todo 
-
 function monkeypatchCustomEventsAdd(OG) {
   return function addEventListener_customEvents(type, cb, ...args) {
     const Definition = events[type];
@@ -46,9 +44,9 @@ function monkeypatchCustomEventsAdd(OG) {
       let {instance, list, meta} = customEventInstances.get(this, Definition) || {};
       if (!instance) {
         meta = getOrMakeMeta(type, this);
-        //todo here we need to get the old state of the 
-        //todo append the interface of the capture lock on the meta element for the given type
         instance = new Definition(meta), list = [];
+        const {state, value} = meta.getState() || Definition.getState();
+        instance.enterState(state, value);
         customEventInstances.set(this, Definition, {instance, list, meta});
       }
       list.push({type, cb, args});

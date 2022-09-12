@@ -29,8 +29,6 @@ export function EventStateMachine(Base) {
     constructor(meta) {
       super(meta);
       this.defaultState = Object.keys(this.#stateToListenerDict)[0];
-      if (this.state === undefined)  //if no superclass has triggered enterState, then do so using the first state in the list.
-        this.enterState(this.defaultState);
     }
 
     //This cannot be done in the constructor, but must be done on demand.

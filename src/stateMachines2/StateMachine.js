@@ -5,14 +5,18 @@ export class NodeStateMachine {
 
   constructor(meta) {
     this.#meta = meta;
-    meta.reset = _ => this.reset(); //todo can be done in the event listener??
+    Object.defineProperty(meta, "reset", {
+      value: function () {
+        return this;
+      }.bind(this)
+    });
   }
 
   get prefix() {
     return this.constructor.prefix;
   }
 
-  get meta(){
+  get meta() {
     return this.#meta;
   }
 
@@ -35,10 +39,7 @@ export class NodeStateMachine {
   enterState(state, value) {
     this.#state = state;
     this.#stateValue = value;
-    this.#meta.setAttribute("state", state);
-    value === undefined ?
-      this.#meta.removeAttribute("statevalue") :
-      this.#meta.setAttribute("statevalue", JSON.stringify(value));
+    this.#meta.setState(state, value);
   }
 
   leaveState() {

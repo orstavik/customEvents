@@ -1,14 +1,49 @@
+import {MetaCaptureHTMLElement} from "./HTMLMetaElement_counter.js";
+
+const capture = MetaCaptureHTMLElement.singleton("capture");
+
 function upgradeMeta(meta, target, targets) {
   Object.defineProperties(meta, {
     "target": {
       configurable: false, get() {
         return target
       }
-    }
-  }, {
+    },
     "targets": {
       configurable: false, get() {
         return targets
+      }
+    },
+    "observe": {
+      value: function observe(event) {
+        const metaId = capture.getCaptureKey(event);
+        this.setAttribute("capture", (this.getAttribute("capture") ?? "") + (" " + metaId))
+      }
+    },
+    "capture": {
+      value: function capture() {
+        for (let key of this.getAttribute("capture").split(" "))
+          for (let metaMachine of document.head.querySelectorAll(`:scope > meta[capture~="${key}"]`))
+            metaMachine !== this.meta && metaMachine.reset();
+      }
+    },
+    "setState": {
+      value: function setState(state, value) {
+        this.setAttribute("state", state);
+        value === undefined ?
+          this.removeAttribute("statevalue") :
+          this.setAttribute("statevalue", JSON.stringify(value));
+      }
+    },
+    "getState": {
+      value: function getState() {
+        if (this.hasAttribute("state"))
+          return {state: this.getAttribute("state"), value: this.getAttribute("statevalue")};
+      }
+    },
+    "state": {
+      configurable: false, get() {
+        return this.getAttribute("state");
       }
     }
   });
@@ -26,11 +61,11 @@ export function getOrMakeMeta(attr, target) {
     document.head.append(meta);
     return upgradeMeta(meta, target, targets);
   }
-  if (meta.target === target)
-    throw "unknown bug.";
-  if (meta.target !== undefined)
-    throw new Error("Two state machines try to connect to the same <meta> element.");
-  return upgradeMeta(meta, target, targets);    //resurrection meta
+  if (meta.target === undefined)
+    return upgradeMeta(meta, target, targets);    //resurrection meta
+  throw "Bug type wtf!!";
+  //either meta.target !== target, and we have two statemachines trying to connect to the same meta element
+  //or, meta.target=== target, and we have the same statemachine trying to connect to its meta element twice.
 }
 
 //todo this might not be persistable if a shadowDom gives IDs dynamically during construction.
