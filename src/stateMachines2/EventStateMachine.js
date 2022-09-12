@@ -26,11 +26,6 @@ export function EventStateMachine(Base) {
     #seenEvents = new WeakSet();
     #_stateToListenerDict;
 
-    constructor(meta) {
-      super(meta);
-      this.defaultState = Object.keys(this.#stateToListenerDict)[0];
-    }
-
     //This cannot be done in the constructor, but must be done on demand.
     // The reason is that super class constructors may call enterState or leaveState
     // that depend on the #stateToListenerDict property.
@@ -56,14 +51,12 @@ export function EventStateMachine(Base) {
     }
 
     leaveState() {
-      //super.leaveState() voids this.state, therefore subclass.leaveState() before superclass.leaveState()
       for (let [event, target, listener] of this.#stateToListenerDict[this.state])
         target.removeEventListener(event, listener);
       super.leaveState();
     }
 
     destructor() {
-      //super.destructor() voids this.state, therefore subclass.destructor() before superclass.destructor()
       for (let [event, target, listener] of this.#stateToListenerDict[this.state])
         target.removeEventListener(event, listener);
       super.destructor();
@@ -73,7 +66,7 @@ export function EventStateMachine(Base) {
       return e => {
         if (this.#seenEvents.has(e))
           return;
-        const nextStateValue = action.call(this, e, this.owner, this.stateValue);
+        const nextStateValue = action.call(this, e, this.owner, this.stateValue, this.meta);
         if (nextStateValue === false)   //todo make the next state value from false to undefined, or throw??
           return;
         this.#seenEvents.add(e);

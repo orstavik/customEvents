@@ -24,8 +24,9 @@ function upgradeMeta(meta, target, targets) {
     "capture": {
       value: function capture() {
         const queryAllMatching = this.getAttribute("capture").split(" ").map(key => `:scope > meta[capture~="${key}"]`).join(", ");
-        for (let metaMachine of document.head.querySelectorAll(queryAllMatching))
-          metaMachine !== this && metaMachine.reset();
+        for (let meta of document.head.querySelectorAll(queryAllMatching))
+          meta !== this && meta.reset();
+        this.removeAttribute("capture");
       }
     },
     "getState": {
