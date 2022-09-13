@@ -1,15 +1,14 @@
 const events = {};
-const definedEventControllers = new WeakMap();
 window.customEvents ??= {};
-customEvents.define = function (str, Class) {
-  if (str in events)
-    throw str + " is already defined as a custom event.";
-  if (definedEventControllers.has(Class))
-    throw `${Class.name} is already defined as "${definedEventControllers.get(Class)}". 
-    What about 'customEvents.define("${str}", class Something extends ${Class.name}{});'?`;
-  definedEventControllers.set(Class, str);
-  Class.prefix = str;
-  events[str] = Class;
+customEvents.define = function (prefix, Class) {
+  const overlapDefinition = Object.keys(events).find(old => prefix.startsWith(old) || old.startsWith(prefix));
+  if (overlapDefinition)
+    throw `The customEvent "${prefix}" is already defined as "${overlapDefinition}".`;
+  if (Class.prefix)
+    throw `${Class.name} definition is already used (${Class.name}.prefix === "${Class.prefix}"). 
+    What about 'customEvents.define("${prefix}", class Something extends ${Class.name}{});'?`;
+  Class.prefix = prefix;
+  events[prefix] = Class;
 };
 
 //obj+obj => obj weakmap
