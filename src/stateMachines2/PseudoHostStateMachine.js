@@ -1,7 +1,7 @@
 import {NodeStateMachine} from "./StateMachine.js";
 
 export function ReflectStateMachine(Base) {
-  if (!NodeStateMachine.isPrototypeOf(Base) && NodeStateMachine !== Base)
+  if (NodeStateMachine !== Base && !NodeStateMachine.isPrototypeOf(Base))
     throw new TypeError(`${Base.name} is not a subclass of NodeStateMachine.`);
 
   return class ReflectStateMachine extends Base {
@@ -18,7 +18,7 @@ export function ReflectStateMachine(Base) {
 }
 
 export function ReflectHostsStateMachine(Base) {
-  if (!NodeStateMachine.isPrototypeOf(Base))
+  if (NodeStateMachine !== Base && !NodeStateMachine.isPrototypeOf(Base))
     throw new TypeError(`${Base.name} is not a subclass of NodeStateMachine.`);
 
   return class ReflectHostsStateMachine extends Base {
@@ -37,7 +37,7 @@ export function ReflectHostsStateMachine(Base) {
 }
 
 export function PseudoAttributesStateMachine(Base) {
-  if (!NodeStateMachine.isPrototypeOf(Base))
+  if (NodeStateMachine !== Base && !NodeStateMachine.isPrototypeOf(Base))
     throw new TypeError(`${Base.name} is not a subclass of NodeStateMachine.`);
 
   return class PseudoHostStateMachine extends Base {

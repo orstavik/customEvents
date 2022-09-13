@@ -22,7 +22,7 @@ const captureCounter = new CaptureCounter("capture");
  */
 
 export function EventStateMachine(Base) {
-  if (!NodeStateMachine.isPrototypeOf(Base))
+  if (NodeStateMachine !== Base && !NodeStateMachine.isPrototypeOf(Base))
     throw new TypeError(`${Base.name} is not a subclass of NodeStateMachine.`);
 
   return class EventStateMachine extends Base {

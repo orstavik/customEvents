@@ -20,7 +20,7 @@ function upgradeMeta(meta, target, targets) {
     },
     "state": {
       configurable: false, get() {
-        return this.hasAttribute("state") ? this.getAttribute("state") : undefined;
+        return this.getAttribute("state");
       }, set(state) {
         state === undefined ? this.removeAttribute("state") : this.setAttribute("state", state);
       }
