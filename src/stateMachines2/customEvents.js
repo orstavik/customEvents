@@ -11,6 +11,12 @@ customEvents.define = function (prefix, Class) {
   events[prefix] = Class;
 };
 
+function getDefinition(prefix) {
+  for (let def in events)
+    if (prefix.startsWith(def))
+      return events[def];
+}
+
 //obj+obj => obj weakmap
 class OOWeakMap extends WeakMap {
   get(o1, o2) {
@@ -37,18 +43,18 @@ import {getOrMakeMeta} from "./HTMLMetaElement_target.js";
 
 function monkeypatchCustomEventsAdd(OG) {
   return function addEventListener_customEvents(type, cb, ...args) {
-    const Definition = events[type];                   //todo look for prefix, not for exact match.
+    const Definition = getDefinition(type);
     if (Definition) {
       //only one customEventInstance with the same Definition is added to the same element.
       let {instance, list, meta} = customEventInstances.get(this, Definition) || {};
       if (!instance) {
-        meta = getOrMakeMeta(type, this);
+        meta = getOrMakeMeta(Definition.prefix, this);
         instance = new Definition(meta), list = [];
         const {state, value} = meta.getState() || Definition.defaultState();
         instance.enterState(state, value);
         customEventInstances.set(this, Definition, {instance, list, meta});
       }
-      list.push({type, cb, args});
+      list.push({type: Definition.prefix, cb, args});
     }
     OG.call(this, type, cb, ...args);
   }
@@ -56,7 +62,7 @@ function monkeypatchCustomEventsAdd(OG) {
 
 function monkeypatchCustomEventsRemove(OG) {
   return function removeEventListener_customEvents(type, cb, ...args) {
-    const Definition = events[type];
+    const Definition = getDefinition(type);
     if (Definition) {
       let {instance, list, meta} = customEventInstances.get(this, Definition); //one customEventInstance per target element
       for (let i = 0; i < list.length; i++) {

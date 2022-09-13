@@ -70,7 +70,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
       };
     }
 
-    static get capturePhases(){
+    static get capturePhases() {
       return {
         start: "reset",
         observe: "observe",
@@ -89,8 +89,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
 
     constructor(meta) {
       super(meta);
-      //todo use the meta instead of the owner to cache the default userSelect state
-      this.owner.style.setProperty("--userSelectDefault", this.owner.style.userSelect);
+      this.meta.setAttribute("userSelectDefault", this.owner.style.userSelect);
       this.owner.style.userSelect = "none";
     }
 
@@ -113,19 +112,15 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
 
     static complete(end, {meta: {target, value: start}}) {
       //todo how to make the best structure for freezing and resurrecting event objects in and out of JSON
-      if(start.target instanceof Event){
+      if (start.target instanceof Event)
         target = start.target;
-      } else if(target.id !== start.id) {
-        let idTarget = target.querySelector("#"+start.id);
-        if(idTarget)
-          target = idTarget;
-      }
+      else if (target.id !== start.id)
+        target = target.querySelector("#" + start.id) ?? target;
       end.defaultAction = _ => target.dispatchEvent(new SwipeEvent(this.prefix, {start, end}));
     }
 
     destructor() {
-      this.owner.style.userSelect = this.owner.style.getPropertyValue("--userSelectDefault");
-      this.owner.style.removeProperty("--userSelectDefault");
+      this.owner.style.userSelect = this.meta.getAttribute("userSelectDefault");
       super.destructor();
     }
   };
