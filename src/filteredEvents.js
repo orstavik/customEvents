@@ -11,7 +11,7 @@ class StrOMap {
 
 //todo the problem here is wording conflicts. How do we avoid naming conflicts here without having a whole lot of back and forth.
 const filters = {
-  "prevented": e=> e.defaultPrevented || e.defaultAction,//todo this isn't prevented, this is "default action unavailable".
+  "prevented": e => e.defaultPrevented || e.defaultAction,//todo this isn't prevented, this is "default action unavailable".
   "shift": e => e.shiftKey,
   "meta": e => e.metaKey,
   "alt": e => e.altKey,
@@ -27,8 +27,8 @@ const filters = {
 };
 
 window.customEvents ??= {};
-customEvents.defineFilter = function(key, func){
-  if(filters[key])
+customEvents.defineFilter = function (key, func) {
+  if (filters[key])
     throw key + " is already declared as an event filter.";
   filters[key] = func;
 };
