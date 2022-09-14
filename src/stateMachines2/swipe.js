@@ -87,7 +87,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
         Math.abs(now.x - start.x) > minDistance || Math.abs(now.y - start.y) > minDistance;
     }
 
-    constructor(meta) {
+    constructor(meta, suffix) {
       super(meta);
       this.meta.setAttribute("userSelectDefault", this.owner.style.userSelect);
       this.owner.style.userSelect = "none";

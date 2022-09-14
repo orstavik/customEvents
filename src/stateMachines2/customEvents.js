@@ -49,11 +49,12 @@ function monkeypatchCustomEventsAdd(OG) {
       let {instance, list, meta} = customEventInstances.get(this, Definition) || {};
       if (!instance) {
         meta = getOrMakeMeta(Definition.prefix, this);
-        instance = new Definition(meta), list = [];
+        instance = new Definition(meta, type.substring(Definition.prefix.length)), list = [];
         const {state, value} = meta.getState() || Definition.defaultState();
         instance.enterState(state, value);
         customEventInstances.set(this, Definition, {instance, list, meta});
       }
+      //todo instance.listenCallback(type); //no longer sure how this plays out.
       list.push({type: Definition.prefix, cb, args});
     }
     OG.call(this, type, cb, ...args);
@@ -82,7 +83,7 @@ function monkeypatchCustomEventsRemove(OG) {
   }
 }
 
-import {monkeypatchFilteredEvents_add, monkeypatchFilteredEvents_remove} from "../filteredEvents.js";
+import {monkeypatchFilteredEvents_add, monkeypatchFilteredEvents_remove} from "./filteredEvents.js";
 import {monkeyDefaultAction} from "../Event.defaultAction.js";
 //monkeypatch the add/removeEventListener
 (function (EventTargetOG, addEventListenerOG, removeEventListenerOG) {
