@@ -1,18 +1,18 @@
 <test-html test="tripple-click.html">
   <script expected>
-    ["click", "click", "click", "tripple-click"]
+    ["click", "click", "click", "trippleclick"]
   </script>
 </test-html>
 
 <test-html test="tripple-prevent-click.html">
   <script expected>
-    ["H1", "DIV", "MAIN", "DIV", "MAIN", "H1", "DIV", "MAIN", "H2", "DIV", "MAIN", "DIV", "MAIN", "H2", "DIV", "MAIN", "tripple-click"]
+    ["H1", "DIV", "MAIN", "DIV", "MAIN", "H1", "DIV", "MAIN", "H2", "DIV", "MAIN", "DIV", "MAIN", "H2", "DIV", "MAIN", "trippleclick"]
   </script>
 </test-html>
 
 <test-html test="shift-click.html">
   <script expected>
-    ["click", "click_shift", "click"]
+    ["click", "click-shift", "click"]
   </script>
 </test-html>
 
@@ -21,12 +21,12 @@
     ["click", "child"],
     ["click", "parent"],
     ["click", "child"],
-    ["tripple-click", "parent"],
+    ["trippleclick", "parent"],
     ["click", "child"],
     ["click", "child"],
     "wait for it",
     ["click", "child"],
-    ["tripple-click", "child"]
+    ["trippleclick", "child"]
   ]</script>
 </test-html>
 

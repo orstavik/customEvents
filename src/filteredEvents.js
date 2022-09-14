@@ -27,20 +27,21 @@ const filters = {
 };
 
 window.customEvents ??= {};
-customEvents.defineFilter = function (key, func) {
-  if (filters[key])
-    throw key + " is already declared as an event filter.";
-  filters[key] = func;
+customEvents.defineFilter = function (prefix, Function) {
+  const overlapDefinition = Object.keys(filters).find(old => prefix.startsWith(old) || old.startsWith(prefix));
+  if (overlapDefinition)
+    throw `The eventFilter "${prefix}" is already defined as "${overlapDefinition}".`;
+  filters[prefix] = Function;
 };
 
 const filteredCallbacks = new StrOMap();
 
 export function monkeypatchFilteredEvents_add(OG) {
   return function addEventListener_filtered(type, cb, ...args) {
-    const [name, ...filter] = type.split("_");
+    const [name, ...filter] = type.split("-");
     if (!filter.length)
       return OG.call(this, type, cb, ...args);
-    const filterKey = filter.join("_");
+    const filterKey = filter.join("-");
     let wrapped = filteredCallbacks.get(filterKey, cb);
     if (!wrapped) {
       wrapped = function eventListenerFilter(e) {
@@ -57,10 +58,10 @@ export function monkeypatchFilteredEvents_add(OG) {
 
 export function monkeypatchFilteredEvents_remove(OG) {
   return function removeEventListener_filtered(type, cb, ...args) {
-    const [name, ...filter] = type.split("_");
+    const [name, ...filter] = type.split("-");
     if (!filter.length)
       return OG.call(this, type, cb, ...args);
-    const filterKey = filter.join("_");
+    const filterKey = filter.join("-");
     let wrapped = filteredCallbacks.get(filterKey, cb);
     if (!wrapped)
       return OG.call(this, type, cb, ...args);

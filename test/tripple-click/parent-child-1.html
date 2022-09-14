@@ -6,7 +6,7 @@
   import {} from "../../src/customEvents.js";
   import {TrippleClick} from "../../src/events/tripple-click.js";
 
-  customEvents.define("tripple-click", TrippleClick);
+  customEvents.define("trippleclick", TrippleClick);
   const parent = document.querySelector("#parent");
   const child = document.querySelector("#child");
 
@@ -15,11 +15,11 @@
   }
 
   document.body.addEventListener("click", log);
-  document.body.addEventListener("tripple-click", log);
+  document.body.addEventListener("trippleclick", log);
 
   //todo I should not need these tripple-click event listeners, as the one on document.body is global and could replace them both
-  parent.addEventListener("tripple-click", _ => "do nothing");  //adding empty listeners to add the event controller
-  child.addEventListener("tripple-click", _ => "do nothing");   //adding empty listeners to add the event controller
+  parent.addEventListener("trippleclick", _ => "do nothing");  //adding empty listeners to add the event controller
+  child.addEventListener("trippleclick", _ => "do nothing");   //adding empty listeners to add the event controller
 
   child.click();
   parent.click();

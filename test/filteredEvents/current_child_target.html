@@ -11,17 +11,17 @@
   const h1 = document.querySelector("h1");
   const div = document.querySelector("div");
   div.addEventListener("click", e => console.log("click"));
-  const listener1 = e => console.log("click_childtarget");
-  const listener2 = e => console.log("click_currenttarget");
-  h1.addEventListener("click_childtarget", listener1);
-  div.addEventListener("click_currenttarget", listener2);
-  div.addEventListener("click_childtarget", e => console.log("oh no 1"));
-  h1.addEventListener("click_currenttarget", e => console.log("oh no 2"));
+  const listener1 = e => console.log("click-childtarget");
+  const listener2 = e => console.log("click-currenttarget");
+  h1.addEventListener("click-childtarget", listener1);
+  div.addEventListener("click-currenttarget", listener2);
+  div.addEventListener("click-childtarget", e => console.log("oh no 1"));
+  h1.addEventListener("click-currenttarget", e => console.log("oh no 2"));
   console.log("filters added");
   div.click();
 
   console.log("filters removed");
-  h1.removeEventListener("click_childtarget", listener1);
-  div.removeEventListener("click_currenttarget", listener2);
+  h1.removeEventListener("click-childtarget", listener1);
+  div.removeEventListener("click-currenttarget", listener2);
   div.click();
 </script>

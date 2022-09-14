@@ -7,8 +7,8 @@
 
   const h1 = document.querySelector("h1");
   h1.addEventListener("click", e => console.log(e.defaultPrevented));
-  h1.addEventListener("click_prevented", e => console.log("error, this event listener should be filtered away."));
+  h1.addEventListener("click-prevented", e => console.log("error, this event listener should be filtered away."));
   h1.addEventListener("click", e => e.preventDefault());
-  h1.addEventListener("click_prevented", e => console.log(e.defaultPrevented));
+  h1.addEventListener("click-prevented", e => console.log(e.defaultPrevented));
   h1.click();
 </script>
