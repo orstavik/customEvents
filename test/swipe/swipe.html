@@ -13,8 +13,8 @@
   const x1 = h1.offsetLeft;
   const y1 = h1.offsetTop;
 
-  function dispatchMouse(type, clientX,clientY){
-    h1.dispatchEvent(new MouseEvent("mouse" + type, {clientX, clientY, bubbles: true, buttons:1}));
+  function dispatchMouse(type, clientX, clientY) {
+    h1.dispatchEvent(new MouseEvent("mouse" + type, {clientX, clientY, bubbles: true, buttons: 1}));
   }
 
   const tasks = [
@@ -28,11 +28,13 @@
     _ => dispatchMouse("up", x1 + 7, y1 + 7),
     _ => console.log(h1.hasAttribute("::swipe"))
   ];
-  function nextTask(){
-    if(!tasks.length)
+
+  function nextTask() {
+    if (!tasks.length)
       return;
     tasks.shift()();
-    setTimeout(nextTask);
+    setTimeout(nextTask, 5);
   }
+
   setTimeout(nextTask, 50);
 </script>

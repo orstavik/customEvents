@@ -34,13 +34,16 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     static fsm() {
       return {
         start: [
-          ["observe", Swipe.startObserving, "pointerdown_1"]
+          ["observe", Swipe.startObserving, "pointerdown-1"]
         ],
         observe: [
-          ["start", Swipe.reset, "pointermove_prevented", window],          //this check should be done after the propagation has finished too..
-          ["start", Swipe.reset, "pointermove_outofbounds", window],        //this event controller needs to react to the preventDefault on the pointer move,
-                                                                            //also when this is called later in the propagation hierarchy.
-          ["active", Swipe.activate, "pointermove_1", window],
+          //as the secondary event listeners in the gesture is attached to the window,
+          //the preventDefault will work as long as the listener calling preventDefault is added to the window itself.
+          //This can be supported by having all event listeners on window be passive: true.
+          ["start", Swipe.reset, "pointermove-prevented", window],
+          ["start", Swipe.reset, "pointermove-outofbounds", window],
+
+          ["active", Swipe.activate, "pointermove-1", window],
 
           ["start", Swipe.reset, "pointerup", window],
           ["start", Swipe.reset, "blur", window],
@@ -48,10 +51,10 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
           ["start", Swipe.reset, "pointerdown", window],
         ],
         active: [
-          ["start", Swipe.complete, "pointerup_1", window],
+          ["start", Swipe.complete, "pointerup-1", window],
 
-          ["start", Swipe.cancel, "pointermove_prevented", window],
-          ["start", Swipe.cancel, "pointermove_outofbounds", window],
+          ["start", Swipe.cancel, "pointermove-prevented", window],
+          ["start", Swipe.cancel, "pointermove-outofbounds", window],
           ["start", Swipe.cancel, "pointerup", window],
           ["start", Swipe.cancel, "blur", window],
           ["start", Swipe.cancel, "selectstart", window],
@@ -74,7 +77,12 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
       owner.style.userSelect = "none";
     }
 
+    //todo following the :hover principle, we should update the ::swipe-observe in a consistent raf-loop.
+    //todo and the ::swipe-observe is a css pseudo-class.
+    //todo so, we would be making a pattern for css pseudo-classes.
     static startObserving(e, owner) {
+      //todo we need the startEvent target to be resumable.
+      //todo we need to mark the documents downwards?? and upwards?? with the swipe observe?
       owner.setAttribute("::swipe-observe", document.head.eventLoop.firstChild.id); //the firstChild is the current event loop
     }
 
@@ -84,8 +92,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
 
     static activate(e, owner) {
       let el = document.head.eventLoop.querySelector("#" + owner.getAttribute("::swipe-observe"));
-      el.event;
-      const startEvent = el.event ;
+      const startEvent = el.event;
       if (!Swipe.longEnough(startEvent, e))
         return false;
       owner.setAttribute("::swipe-active", document.head.eventLoop.firstChild.id);
@@ -102,12 +109,11 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
         const startEvent = document.head.eventLoop.querySelector("#" + owner.getAttribute("::swipe-observe")).event;
         owner.removeAttribute("::swipe-observe");
         owner.removeAttribute("::swipe-active");
-        debugger
         startEvent.target.dispatchEvent(new SwipeEvent("swipe", {
           swipeDistX: e.x - startEvent.x,
           swipeDistY: e.y - startEvent.y
         }))
-      }
+      };
     }
 
     destructor() {
