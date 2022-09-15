@@ -38,18 +38,20 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
       this.owner.style.userSelect = "none";
       this.mo = new MutationObserver(() => {
         if (this.owner.hasAttribute("::swipe")) {                    //todo can we get conflicts when we listen for such things on the window later??
-          this.owner.removeEventListener("mousedown_1", this.mousedownInitialListener);
+          this.owner.removeEventListener("mousedown-buttons1", this.mousedownInitialListener);
           window.addEventListener("mousedown", reset);
-          window.addEventListener("mousemove", this.mousemoveListener);
-          window.addEventListener("mousemove_outofbounds", reset);              //todo this is triggered, because there is no size of the window??
+          // window.addEventListener("mousemove", this.mousemoveListener);
+          window.addEventListener("mousemove-prevented", reset);
+          window.addEventListener("mousemove-outofbounds", reset);
           window.addEventListener("mouseup", this.mouseupListener);
           window.addEventListener("blur", reset);
           window.addEventListener("selectstart", reset);           //todo the selectstart should be on the element, right?
         } else {
-          this.owner.addEventListener("mousedown_1", this.mousedownInitialListener);
+          this.owner.addEventListener("mousedown-buttons1", this.mousedownInitialListener);
           window.removeEventListener("mousedown", reset);
-          window.removeEventListener("mousemove", this.mousemoveListener);
-          window.removeEventListener("mousemove_outofbounds", reset);
+          // window.removeEventListener("mousemove", this.mousemoveListener);
+          window.removeEventListener("mousemove-prevented", reset);
+          window.removeEventListener("mousemove-outofbounds", reset);
           window.removeEventListener("mouseup", this.mouseupListener);
           window.removeEventListener("blur", reset);
           window.removeEventListener("selectstart", reset);       //todo the selectstart should be on the element, right?
@@ -57,7 +59,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
       });
       this.mo.observe(this.owner, {attributeFilter: ["::swipe"]});
       if (!this.owner.hasAttribute("::swipe"))
-        this.owner.addEventListener("mousedown_1", this.mousedownInitialListener);
+        this.owner.addEventListener("mousedown-buttons1", this.mousedownInitialListener);
     }
 
     reset() {

@@ -15,7 +15,7 @@ export class TrippleClick {
   }
 
   #updateState() {
-    this.owner.setAttribute("_tripple-click", this.clicks.length);
+    this.owner.setAttribute("_" + this.constructor.prefix, this.clicks.length);
   }
 
   onClick(e) {
@@ -23,7 +23,7 @@ export class TrippleClick {
       return this.reset();
 
     if (this.clicks.length === 2) {
-      const trippleClick = new e.constructor("tripple-click", e);
+      const trippleClick = new e.constructor(this.constructor.prefix, e);
       trippleClick.clicks = [...this.clicks, e];
       e.defaultAction = _ => this.owner.dispatchEvent(trippleClick);
       return this.reset();

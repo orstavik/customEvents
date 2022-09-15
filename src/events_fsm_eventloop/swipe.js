@@ -34,7 +34,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     static fsm() {
       return {
         start: [
-          ["observe", Swipe.startObserving, "pointerdown-1"]
+          ["observe", Swipe.startObserving, "pointerdown-buttons1"]
         ],
         observe: [
           //as the secondary event listeners in the gesture is attached to the window,
@@ -43,7 +43,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
           ["start", Swipe.reset, "pointermove-prevented", window],
           ["start", Swipe.reset, "pointermove-outofbounds", window],
 
-          ["active", Swipe.activate, "pointermove-1", window],
+          ["active", Swipe.activate, "pointermove-buttons1", window],
 
           ["start", Swipe.reset, "pointerup", window],
           ["start", Swipe.reset, "blur", window],
@@ -51,7 +51,7 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
           ["start", Swipe.reset, "pointerdown", window],
         ],
         active: [
-          ["start", Swipe.complete, "pointerup-1", window],
+          ["start", Swipe.complete, "pointerup-buttons1", window],
 
           ["start", Swipe.cancel, "pointermove-prevented", window],
           ["start", Swipe.cancel, "pointermove-outofbounds", window],
