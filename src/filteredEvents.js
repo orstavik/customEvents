@@ -34,17 +34,36 @@ customEvents.defineFilter = function (prefix, Function) {
   filters[prefix] = Function;
 };
 
+const boundFilters = {};
+
+function getBoundFilter(f) {
+  if (f in boundFilters)
+    return boundFilters[f];
+  if (f in filters)
+    return boundFilters[f] = filters[f];
+  const prefix = Object.keys(filters).find(pre => f.startsWith(pre));
+  const suffix = f.substring(prefix.length);
+  return boundFilters[f] = function (e) {
+    filters[prefix].call(this, e, suffix, prefix);
+  }
+}
+
 const filteredCallbacks = new StrOMap();
 
 function makeFilterCallback(filter, cb, filterkey) {
+  const readyFilters = [];
   const filteredListener = function eventListenerFilter(e) {
-    for (let f of filter)
-      if (!(f in filters))
+    for (let i = readyFilters.length; i < filter.length; i++) {
+      const filterFunc = getBoundFilter(filter[i]);
+      if (!filterFunc)                               //step 1, check that all the filters are ready, if not, abort everything
         return;
-    for (let f of filter)
-      if (!filters[f](e))
+      readyFilters[i] = filterFunc;
+    }
+    for (let filterFunc of readyFilters) {
+      if(!filterFunc(e))                             //step 2, if one filterFunc returns falsy, then the event processing is cancelled
         return;
-    cb.call(this, e);
+      cb.call(this, e);                              //step 3, all the filters are ok, then run the callback.
+    }
   };
   filteredCallbacks.set(filterkey, cb, filteredListener);
   return filteredListener;
