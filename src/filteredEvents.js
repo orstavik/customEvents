@@ -36,22 +36,27 @@ customEvents.defineFilter = function (prefix, Function) {
 
 const filteredCallbacks = new StrOMap();
 
+function makeFilterCallback(filter, cb, filterkey) {
+  const filteredListener = function eventListenerFilter(e) {
+    for (let f of filter)
+      if (!(f in filters))
+        return;
+    for (let f of filter)
+      if (!filters[f](e))
+        return;
+    cb.call(this, e);
+  };
+  filteredCallbacks.set(filterkey, cb, filteredListener);
+  return filteredListener;
+}
+
 export function monkeypatchFilteredEvents_add(OG) {
   return function addEventListener_filtered(type, cb, ...args) {
     const [name, ...filter] = type.split("-");
     if (!filter.length)
       return OG.call(this, type, cb, ...args);
     const filterKey = filter.join("-");
-    let wrapped = filteredCallbacks.get(filterKey, cb);
-    if (!wrapped) {
-      wrapped = function eventListenerFilter(e) {
-        for (let f of filter)
-          if (f in filters && !filters[f](e))              //todo throw an Error if there is no such filter.
-            return;
-        cb.call(this, e);
-      };
-      filteredCallbacks.set(filterKey, cb, wrapped);
-    }
+    const wrapped = filteredCallbacks.get(filterKey, cb) || makeFilterCallback(filter, cb, filterKey);
     OG.call(this, name, wrapped, ...args);
   }
 }
@@ -62,9 +67,7 @@ export function monkeypatchFilteredEvents_remove(OG) {
     if (!filter.length)
       return OG.call(this, type, cb, ...args);
     const filterKey = filter.join("-");
-    let wrapped = filteredCallbacks.get(filterKey, cb);
-    if (!wrapped)
-      return OG.call(this, type, cb, ...args);
+    const wrapped = filteredCallbacks.get(filterKey, cb) || cb;
     OG.call(this, name, wrapped, ...args);
   }
 }
