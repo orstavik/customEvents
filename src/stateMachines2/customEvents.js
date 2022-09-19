@@ -84,7 +84,7 @@ function monkeypatchCustomEventsRemove(OG) {
   }
 }
 
-import {monkeypatchFilteredEvents_add, monkeypatchFilteredEvents_remove} from "./filteredEvents.js";
+import {monkeypatchFilteredEvents_add, monkeypatchFilteredEvents_remove} from "../filteredEvents.js";
 import {monkeyDefaultAction} from "../Event.defaultAction.js";
 //monkeypatch the add/removeEventListener
 (function (EventTargetOG, addEventListenerOG, removeEventListenerOG) {
