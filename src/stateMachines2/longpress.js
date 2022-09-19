@@ -2,7 +2,7 @@ import {ReflectStateMachine} from "./PseudoHostStateMachine.js";
 import {EventStateMachine} from "./EventStateMachine.js";
 import {NodeStateMachine} from "./StateMachine.js";
 
-const EventStateMachine_resurrectable_reflective = EventStateMachine(ReflectStateMachine(NodeStateMachine));
+const EventStateMachine_reflective = EventStateMachine(ReflectStateMachine(NodeStateMachine));
 
 export class PressEvent extends PointerEvent {
   #start;
@@ -20,7 +20,7 @@ export class PressEvent extends PointerEvent {
 }
 
 export function createLongPress({minDuration = 350, minDistance = 50, direction} = {}) {
-  return class Swipe extends EventStateMachine_resurrectable_reflective {
+  return class Swipe extends EventStateMachine_reflective {
     static fsm() {
       return {
         start: [
@@ -40,7 +40,7 @@ export function createLongPress({minDuration = 350, minDistance = 50, direction}
         active: [
           ["start", Swipe.cancel, "pointermove_prevented", window],
           ["start", Swipe.cancel, "pointermove_outofbounds", window],
-          // ["start", Swipe.cancel, "pointerup", window],   //todo we probably need a filter on this pointerup event.
+          // ["start", Swipe.cancel, "pointerup_filter??", window],   //todo
           ["start", Swipe.cancel, "blur", window],
           ["start", Swipe.cancel, "selectstart", window],
           ["start", Swipe.cancel, "pointerdown", window],

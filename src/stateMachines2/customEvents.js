@@ -49,7 +49,8 @@ function monkeypatchCustomEventsAdd(OG) {
       let {instance, list, meta} = customEventInstances.get(this, Definition) || {};
       if (!instance) {
         meta = getOrMakeMeta(Definition.prefix, this);
-        instance = new Definition(meta, type.substring(Definition.prefix.length)), list = [];
+        const suffix = type.substring(Definition.prefix.length);
+        instance = new Definition(meta, suffix), list = [];
         const {state, value} = meta.getState() || Definition.defaultState();
         instance.enterState(state, value);
         customEventInstances.set(this, Definition, {instance, list, meta});

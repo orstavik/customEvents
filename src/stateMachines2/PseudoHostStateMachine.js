@@ -7,12 +7,12 @@ export function ReflectStateMachine(Base) {
   return class ReflectStateMachine extends Base {
     enterState(state, value) {
       super.enterState(state, value);
-      this.owner.setAttribute("::" + this.prefix, state);
+      this.owner.setAttribute("::" + this.constructor.prefix, state);
     }
 
     destructor() {
       super.destructor();
-      this.owner.removeAttribute("::" + this.prefix);
+      this.owner.removeAttribute("::" + this.constructor.prefix);
     }
   }
 }
@@ -25,13 +25,13 @@ export function ReflectHostsStateMachine(Base) {
     enterState(state, value) {
       super.enterState(state, value);
       for (let el of this.hosts)
-        el.setAttribute("::" + this.prefix, state);
+        el.setAttribute("::" + this.constructor.prefix, state);
     }
 
     destructor() {
       super.destructor();
       for (let el of this.hosts)
-        el.removeAttribute("::" + this.prefix);
+        el.removeAttribute("::" + this.constructor.prefix);
     }
   }
 }
@@ -52,7 +52,7 @@ export function PseudoAttributesStateMachine(Base) {
     enterState(state, value) {
       super.enterState(state, value);
       for (let pseudo of this.constructor.pseudoAttributes) {
-        const type = `::${this.prefix}-${pseudo}`;
+        const type = `::${this.constructor.prefix}-${pseudo}`;
         for (let el of this.hosts)
           value?.[pseudo] === undefined ? el.removeAttribute(type) : el.setAttribute(type, value[pseudo]);
       }
@@ -61,7 +61,7 @@ export function PseudoAttributesStateMachine(Base) {
     destructor() {
       super.destructor();
       for (let pseudo of this.constructor.pseudoAttributes) {
-        const type = `::${this.prefix}-${pseudo}`;
+        const type = `::${this.constructor.prefix}-${pseudo}`;
         for (let el of this.hosts)
           el.removeAttribute(type);
       }

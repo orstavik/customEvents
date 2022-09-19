@@ -41,10 +41,17 @@ function upgradeMeta(meta, target, targets) {
   return meta;
 }
 
+function getHostChainAndId(target) {
+  const targets = hostChain(target);
+  if(targets[0] === document) return {targets, id: "document"};
+  if(targets[0] === window) return {targets, id: "window"};
+  const id = shadowDomQuerySelector(target, targets);
+  return {targets, id};
+}
+
 export function getOrMakeMeta(attr, target) {
   if (!target.isConnected) throw new Error("PersistentEventStateMachines can only be added to elements already connected to the DOM.");
-  const targets = hostChain(target);
-  const id = shadowDomQuerySelector(target, targets);
+  const {targets, id} = getHostChainAndId(target);
   let meta = document.head.querySelector(`:scope > meta[${attr}=${id}]`);
   if (!meta) {        //no meta, making a new one
     meta = document.createElement(`meta`);
@@ -54,18 +61,17 @@ export function getOrMakeMeta(attr, target) {
   }
   if (meta.target === undefined)
     return upgradeMeta(meta, target, targets);    //resurrection meta
-  throw "Bug type wtf!!";
-  //either meta.target !== target, and we have two statemachines trying to connect to the same meta element
-  //or, meta.target=== target, and we have the same statemachine trying to connect to its meta element twice.
+  throw `wtf?! Either meta.target !== target(two statemachines trying to connect to the same meta element),
+  or meta.target=== target (the same statemachine trying to connect to its meta element twice).`;
 }
 
 //todo this might not be persistable if a shadowDom gives IDs dynamically during construction.
 // This will only work if IDs are assigned to elements in shadowDOM so that the same elements
 // get the same ID whenever it is reconstructed.
 function shadowDomQuerySelector(el, hosts) {
-  const ids = hosts.map(el => el.id);
+  const ids = hosts.map(el => (el instanceof ShadowRoot) ? "#shadow" : el.id);
   if (!ids.every(id => id)) throw `A uid cannot be created for the given state machine: ${el.tagName}`;
-  return ids.join(" >> ");
+  return ids.join(" >>> ");
 }
 
 export function hostChain(el) {

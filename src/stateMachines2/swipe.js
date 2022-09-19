@@ -44,22 +44,22 @@ export function createSwipe({minDuration = 350, minDistance = 50, direction} = {
     static fsm() {
       return {
         start: [
-          ["observe", Swipe.startObserving, "pointerdown_1"]
+          ["observe", Swipe.startObserving, "pointerdown-buttons1"]
         ],
         observe: [
-          ["start", Swipe.reset, "pointermove_prevented", window],          //this check should be done after the propagation has finished too..
-          ["start", Swipe.reset, "pointermove_outofbounds", window],        //this event controller needs to react to the preventDefault on the pointer move,
+          ["start", Swipe.reset, "pointermove-prevented", window],          //this check should be done after the propagation has finished too..
+          ["start", Swipe.reset, "pointermove-outofbounds", window],        //this event controller needs to react to the preventDefault on the pointer move,
                                                                             //also when this is called later in the propagation hierarchy.
           ["start", Swipe.reset, "pointerup", window],
           ["start", Swipe.reset, "blur", window],
           ["start", Swipe.reset, "selectstart", window],
           ["start", Swipe.reset, "pointerdown", window],
 
-          ["active", Swipe.activate, "pointermove_1", window],
+          ["active", Swipe.activate, "pointermove-buttons1", window],
         ],
         active: [
-          ["start", Swipe.cancel, "pointermove_prevented", window],
-          ["start", Swipe.cancel, "pointermove_outofbounds", window],
+          ["start", Swipe.cancel, "pointermove-prevented", window],
+          ["start", Swipe.cancel, "pointermove-outofbounds", window],
           // ["start", Swipe.cancel, "pointerup", window],   //todo we probably need a filter on this pointerup event.
           ["start", Swipe.cancel, "blur", window],
           ["start", Swipe.cancel, "selectstart", window],
