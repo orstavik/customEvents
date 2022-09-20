@@ -55,7 +55,6 @@ function monkeypatchCustomEventsAdd(OG) {
         instance.enterState(state, value);
         customEventInstances.set(this, Definition, {instance, list, meta});
       }
-      //todo instance.listenCallback(type); //no longer sure how this plays out.
       list.push({type: Definition.prefix, cb, args});
     }
     OG.call(this, type, cb, ...args);
@@ -86,6 +85,7 @@ function monkeypatchCustomEventsRemove(OG) {
 
 import {monkeypatchFilteredEvents_add, monkeypatchFilteredEvents_remove} from "../filteredEvents.js";
 import {monkeyDefaultAction} from "../Event.defaultAction.js";
+import {monkeyEventCapture} from "../Event.captureKey.js";
 //monkeypatch the add/removeEventListener
 (function (EventTargetOG, addEventListenerOG, removeEventListenerOG) {
   EventTargetOG.prototype.addEventListener = monkeypatchFilteredEvents_add(monkeypatchCustomEventsAdd(addEventListenerOG));
@@ -93,3 +93,4 @@ import {monkeyDefaultAction} from "../Event.defaultAction.js";
 })(EventTarget, addEventListener, removeEventListener);
 
 monkeyDefaultAction(Event);
+monkeyEventCapture(Event);

@@ -1,7 +1,4 @@
 import {NodeStateMachine} from "./StateMachine.js";
-import {CaptureCounter} from "./HTMLMetaElement_counter.js";
-
-const captureCounter = new CaptureCounter("capture");
 
 /*
  * Rules for EventStateMachine:
@@ -92,7 +89,7 @@ export function EventStateMachine(Base) {
           }
         }
       } else if (captureType === "observe") {
-        const metaId = captureCounter.getCaptureKey(e);
+        const metaId = e.captureKey;
         const val = this.meta.getAttribute("capture");
         this.meta.setAttribute("capture", val ? val + " " + metaId : metaId);
       }
