@@ -1,0 +1,17 @@
+<head>
+  <meta capture="2 5 3">
+  <meta capture="9 8 7">
+</head>
+<h1>hello sunshine</h1>
+
+<script type="module">
+  import {monkeyEventCapture} from "../../src/Event.captureKey.js";
+
+  monkeyEventCapture(Event);
+
+  window.addEventListener("click", e => console.log(e.captureKey));
+
+  document.body.click();
+  document.body.click();
+  document.body.click();
+</script>
