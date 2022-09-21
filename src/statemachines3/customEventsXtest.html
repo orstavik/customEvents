@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="module" src="customEventsX.js"></script>
+</head>
+<body>
+<h1></h1>
+<script type="module">
+  const h1 = document.querySelector("h1");
+  customEventFilters.define("alice", (e, suffix) => console.log(e, suffix));
+  customEventFilters.define("bob", (e, suffix) => console.log(e, suffix));
+  //todo here we should have a different event listener type, we could spawn an event?
+  customEvents.define("myclick", class MyClick {
+    static addedToTargetCallback(suffix, filterFunc, customAttr, target) {
+      console.log(this.prefix, suffix)
+      console.log(filterFunc)
+      console.log(customAttr, target)
+      return filterFunc;
+    }
+  });
+  customEvents.define("timeout", class MyClick {
+    static addedToTargetCallback(suffix, filterFunc, customAttr, target) {
+      setTimeout(function () {
+        filterFunc.call(target, new Event("timeout"));
+        target.removeAttribute(customAttr.name);
+      }, parseInt(suffix));
+    }
+  });
+
+  h1.addEventListener("myclick_one:alice_one:bob_two", e => console.log(e, "anonymous"));
+  h1.addEventListener("click:alice_one:bob_two", e => console.log(e, "anonymous"));
+  h1.click();
+
+  h1.addEventListener("timeout1000:alice_timerAlice", e => console.log(e, "timetime"));
+</script>
+</body>
+<!--</html>-->
