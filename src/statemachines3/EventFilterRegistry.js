@@ -42,7 +42,7 @@ export class EventFilterRegistry {
 
   findAndBind(name) {
     if (this[name])
-      return this[name];    00//todo prefix + attr.value? we need to pass in value of the customAttribute
+      return this[name];         //todo prefix + attr.value? we need to pass in value of the customAttribute
     const prefix = this.findPrefix(name);
     if (!prefix)
       return;
