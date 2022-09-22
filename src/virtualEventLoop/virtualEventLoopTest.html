@@ -1,0 +1,14 @@
+<script src="https://cdn.jsdelivr.net/gh/orstavik/parse@v1.0.1/parse.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/orstavik/ElementObserver/constructionFrame.js"></script>
+<script src="virtualEventLoop.js"></script>
+<script src="EventRegistry.js"></script>
+<script src="EventFilterRegistry.js"></script>
+
+<h1>hello click:log:sunshine</h1>
+<script>
+  customEventFilters.define("log", e=> console.log(e.type));
+  customEventFilters.define("sunshine", e=> console.info("bob"));
+  const h1 = document.querySelector("h1");
+  h1.setAttribute("click:log:sunshine");
+  h1.click();
+</script>
